@@ -11,12 +11,28 @@
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 4rem;
+  box-sizing: border-box;
 }
 
 .navbar-brand {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  animation: logo-animation 5s both infinite;
+}
+.navbar-brand h1 {
   font-size: 1.5rem;
   font-weight: bold;
   color: #646cff;
+}
+
+.navbar-brand img {
+  width: auto;
+  height: 100%;
+  aspect-ratio: 1/1;
 }
 
 .main-content {
@@ -39,4 +55,30 @@
 
 .logout-button:hover {
   background-color: #535bf2;
+}
+
+@keyframes logo-animation {
+  0%,
+  33%,
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+  5% {
+    transform: scale3d(1.25, 0.75, 1);
+  }
+  7% {
+    transform: scale3d(0.75, 1.25, 1);
+  }
+  9% {
+    transform: scale3d(1.15, 0.85, 1);
+  }
+  11% {
+    transform: scale3d(0.95, 1.05, 1);
+  }
+  13% {
+    transform: scale3d(1.05, 0.95, 1);
+  }
+  15% {
+    transform: scale3d(1, 1, 1);
+  }
 }

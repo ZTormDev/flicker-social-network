@@ -40,11 +40,17 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
   };
 
   return (
-    <div>
-      <h2>Register to Flicker</h2>
+    <div className="auth-register">
+      <div className="auth-title">
+        <h2>Register to</h2>
+        <div className="auth-logo">
+          <h2>Flicker</h2>
+          <img src="flickercolor.png" alt="flicker logo" />
+        </div>
+      </div>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group-register">
           <label htmlFor="username">Username:</label>
           <input
             type="text"
@@ -55,7 +61,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
             required
           />
         </div>
-        <div>
+        <div className="form-group-register">
           <label htmlFor="email">Email:</label>
           <input
             type="email"
@@ -66,7 +72,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
             required
           />
         </div>
-        <div>
+        <div className="form-group-register">
           <label htmlFor="password">Password:</label>
           <input
             type="password"
@@ -77,7 +83,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
             required
           />
         </div>
-        <div>
+        <div className="form-group-register">
           <label htmlFor="userImage">User Image URL:</label>
           <input
             type="text"

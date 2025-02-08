@@ -5,6 +5,7 @@ interface UserProfile {
   id: number;
   username: string;
   email: string;
+  userImage: string;
 }
 
 interface SidebarProps {
@@ -28,6 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
         },
       });
       const data = await response.json();
+      console.log(data);
       setProfile(data);
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -46,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
         <div className="profile-section">
           <div className="profile-info">
             <img
-              src="https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=Jameson"
+              src={profile.userImage}
               alt="Profile"
               className="profile-avatar"
             />
@@ -67,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
             friends.map((friend) => (
               <div key={friend.id} className="friend-item">
                 <img
-                  src={`https://api.dicebear.com/7.x/avatars/svg?seed=${friend.username}`}
+                  src={friend.userImage}
                   alt={friend.username}
                   className="friend-avatar"
                 />

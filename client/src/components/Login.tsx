@@ -38,11 +38,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div>
-      <h2>Login to Flicker</h2>
+    <div className="auth">
+      <div className="auth-title">
+        <h2>Login to</h2>
+        <div className="auth-logo">
+          <h2>Flicker</h2>
+          <img src="flickercolor.png" alt="flicker logo" />
+        </div>
+      </div>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group-login">
           <label htmlFor="emailOrUsername">Email or Username:</label>
           <input
             type="text"
@@ -53,7 +59,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             required
           />
         </div>
-        <div>
+        <div className="form-group-login">
           <label htmlFor="password">Password:</label>
           <input
             type="password"

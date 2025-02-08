@@ -80,7 +80,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
       </div>
       <div className="post-content">{post.content}</div>
       <div className="post-footer">
-        <span>Expires in: {timeLeft}</span>
+        <span>Burns in: {timeLeft} 🔥</span>
       </div>
     </div>
   );
