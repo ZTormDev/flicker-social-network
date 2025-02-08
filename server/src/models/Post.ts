@@ -1,21 +1,23 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../config/database';
-import { User } from './User';
+import { Model, DataTypes } from "sequelize";
+import { sequelize } from "../config/database";
+import { User } from "./User";
 
 interface PostAttributes {
-  id?: number; // Making id optional
+  id?: number;
   content: string;
-  userId: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  user_id: number;
+  expires_at?: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export class Post extends Model<PostAttributes> implements PostAttributes {
   public id!: number;
   public content!: string;
-  public userId!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public user_id!: number;
+  public expires_at!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 Post.init(
@@ -29,21 +31,46 @@ Post.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    userId: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: User,
-        key: 'id',
+        key: "id",
       },
+      field: "user_id", // Specify the snake_case field name
+    },
+    expires_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      field: "expires_at", // Specify the snake_case field name
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      field: "created_at", // Specify the snake_case field name
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      field: "updated_at", // Specify the snake_case field name
     },
   },
   {
     sequelize,
-    tableName: 'posts',
+    tableName: "posts",
+    timestamps: true,
+    underscored: true, // This will convert created_at to created_at, etc.
   }
 );
 
-// Define relationship
-Post.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Post, { foreignKey: 'userId' });
+Post.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "User", // Add this line
+});
+User.hasMany(Post, {
+  foreignKey: "user_id",
+  as: "posts", // Add this line
+});
+
+export default Post;

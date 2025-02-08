@@ -1,32 +1,33 @@
 import React, { useState } from "react";
+import "../styles/auth.css";
 
 interface LoginProps {
   onLogin: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [email, setEmail] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Clear any previous errors
+    setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ emailOrUsername, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-        onLogin(); // Call the onLogin callback to update the state in App
+        onLogin();
       } else {
         setError(data.message || "Login failed");
       }
@@ -42,12 +43,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email">Email:</label>
+          <label htmlFor="emailOrUsername">Email or Username:</label>
           <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Email or Username"
+            id="emailOrUsername"
+            value={emailOrUsername}
+            onChange={(e) => setEmailOrUsername(e.target.value)}
             required
           />
         </div>
@@ -55,6 +57,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <label htmlFor="password">Password:</label>
           <input
             type="password"
+            placeholder="Password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

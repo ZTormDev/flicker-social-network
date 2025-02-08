@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import Login from "./components/Login";
+import Register from "./components/Register";
+import HomePage from "./components/HomePage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   useEffect(() => {
-    // Check if the user is logged in when the component mounts
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
@@ -16,18 +16,39 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    window.location.href = "/"; // Refresh the page
+  };
+
+  const toggleRegister = () => {
+    setShowRegister(!showRegister);
+  };
+
+  const handleRegistrationSuccess = () => {
+    setShowRegister(false);
+    setIsLoggedIn(true);
   };
 
   return (
     <>
       {isLoggedIn ? (
-        <div>
-          <h1>Welcome to Flicker!</h1>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
+        <HomePage onLogout={handleLogout} />
       ) : (
-        <Login onLogin={() => setIsLoggedIn(true)} />
+        <div className="auth-container">
+          {showRegister ? (
+            <>
+              <Register onRegisterSuccess={handleRegistrationSuccess} />
+              <button className="toggle-button" onClick={toggleRegister}>
+                Already have an account? Sign in
+              </button>
+            </>
+          ) : (
+            <>
+              <Login onLogin={() => setIsLoggedIn(true)} />
+              <button className="toggle-button" onClick={toggleRegister}>
+                Don't have an account? Sign up
+              </button>
+            </>
+          )}
+        </div>
       )}
     </>
   );

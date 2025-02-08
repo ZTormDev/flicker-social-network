@@ -1,0 +1,63 @@
+.sidebar {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.sidebar h2,
+p {
+  color: #333;
+  text-align: center;
+  margin: 0;
+}
+
+.profile-section {
+  margin-bottom: 2rem;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.profile-details h3 {
+  margin: 0;
+  color: #333;
+}
+
+.profile-details p {
+  margin: 0;
+  color: #666;
+}
+
+.friends-section h2 {
+  margin-bottom: 1rem;
+}
+
+.friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.friend-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}

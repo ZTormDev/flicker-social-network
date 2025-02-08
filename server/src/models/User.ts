@@ -1,13 +1,14 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../config/database';
+import { Model, DataTypes } from "sequelize";
+import { sequelize } from "../config/database";
 
 interface UserAttributes {
-  id: number;
+  id?: number; // Making id optional
   username: string;
   email: string;
   passwordHash: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  userImage?: string; // Add userImage property
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export class User extends Model<UserAttributes> implements UserAttributes {
@@ -15,8 +16,9 @@ export class User extends Model<UserAttributes> implements UserAttributes {
   public username!: string;
   public email!: string;
   public passwordHash!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public userImage!: string; // Add userImage property
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 User.init(
@@ -43,18 +45,23 @@ User.init(
       type: DataTypes.CHAR(60),
       allowNull: false,
     },
-    createdAt: {
+    userImage: {
+      // Add userImage property
+      type: DataTypes.STRING(255),
+      allowNull: true, // Allow null values for userImage
+    },
+    created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
-    updatedAt: {
+    updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
   },
   {
     sequelize,
-    tableName: 'users',
+    tableName: "users",
     timestamps: true, // Sequelize will handle timestamps automatically
     underscored: true, // Use snake_case for column names
   }

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
 interface JwtPayload {
   id: number;
@@ -8,18 +8,14 @@ interface JwtPayload {
 declare global {
   namespace Express {
     interface Request {
-      userId?: number;
+      user_id?: number;
     }
   }
 }
 
-export const auth = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
       throw new Error();
@@ -27,12 +23,12 @@ export const auth = async (
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'secret'
+      process.env.JWT_SECRET || "secret"
     ) as JwtPayload;
-    
-    req.userId = decoded.id;
+
+    req.user_id = decoded.id;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Please authenticate' });
+    res.status(401).json({ message: "Please authenticate" });
   }
 };

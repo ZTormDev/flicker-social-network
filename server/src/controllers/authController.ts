@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
+import { Op } from 'sequelize';
 
 export const register = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, userImage } = req.body; // Add userImage
 
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -20,7 +21,8 @@ export const register = async (req: Request, res: Response): Promise<Response> =
     const user = await User.create({
       username,
       email,
-      password: hashedPassword,
+      passwordHash: hashedPassword, // Use passwordHash here
+      userImage // Add userImage
     });
 
     // Generate JWT token
@@ -36,7 +38,8 @@ export const register = async (req: Request, res: Response): Promise<Response> =
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        userImage: user.userImage // Add userImage
       }
     });
   } catch (error) {
@@ -47,16 +50,24 @@ export const register = async (req: Request, res: Response): Promise<Response> =
 
 export const login = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { email, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
-    // Find user
-    const user = await User.findOne({ where: { email } });
+    // Find user by email or username
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { email: emailOrUsername },
+          { username: emailOrUsername }
+        ]
+      }
+    });
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

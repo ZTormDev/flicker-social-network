@@ -1,33 +1,33 @@
 export interface User {
-    id: number;
-    username: string;
-    email: string;
-    password: string;
-    createdAt: Date;
-    updatedAt: Date;
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Post {
-    id: number;
-    userId: number;
-    title: string;
-    content: string;
-    createdAt: Date;
-    updatedAt: Date;
+  id: number;
+  user_id: number;
+  title: string;
+  content: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface AuthResponse {
-    token: string;
-    user: User;
+  token: string;
+  user: User;
 }
 
 export interface LoginRequest {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface RegisterRequest {
-    username: string;
-    email: string;
-    password: string;
+  username: string;
+  email: string;
+  password: string;
 }
