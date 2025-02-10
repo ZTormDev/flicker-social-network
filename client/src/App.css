@@ -6,6 +6,10 @@
   background-color: #646cff;
 }
 
+button:focus {
+  outline: none;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

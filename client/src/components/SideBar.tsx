@@ -23,13 +23,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
 
   const fetchProfile = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/users/profile", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(
+        "https://xq1jpm39-5000.brs.devtunnels.ms/api/users/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       const data = await response.json();
-      console.log(data);
       setProfile(data);
     } catch (error) {
       console.error("Error fetching profile:", error);

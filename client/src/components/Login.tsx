@@ -15,25 +15,35 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ emailOrUsername, password }),
-      });
+      console.log("Attempting login...");
+      const response = await fetch(
+        "https://xq1jpm39-5000.brs.devtunnels.ms/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ emailOrUsername, password }),
+        }
+      );
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login error response:", errorData);
+        throw new Error(errorData.message || "Login failed");
+      }
 
       const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("token", data.token);
-        onLogin();
-      } else {
-        setError(data.message || "Login failed");
-      }
+      console.log("Login successful:", data);
+      localStorage.setItem("token", data.token);
+      onLogin();
     } catch (err) {
-      setError("Login failed");
-      console.error("Login error:", err);
+      console.error("Login error details:", err);
+      setError(err instanceof Error ? err.message : "Login failed");
     }
   };
 

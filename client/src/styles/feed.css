@@ -3,18 +3,24 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem;
+  transition: all 0.5s ease-in-out;
+  height: auto;
 }
 
 .posts-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  transition: all 0.5s ease-in-out;
+  height: auto;
 }
 
 .loading {
   text-align: center;
-  padding: 2rem;
+  padding: 1rem;
   color: #666;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
 }
 
 .error-message {

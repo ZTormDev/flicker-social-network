@@ -1,16 +1,47 @@
+/* Update the comes-in animation for smoother effect */
+@keyframes comes-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .post {
-  background: white;
+  background: rgb(255, 255, 255);
   border-radius: 8px;
   padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 1;
+  transition: all 0.5s ease;
+  height: auto;
+  opacity: 0;
+  transform: translateY(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.post.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.post * {
+  z-index: 2;
+  position: relative;
 }
 
 .post-header {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .avatar {
@@ -22,6 +53,10 @@
 .post-info {
   display: flex;
   flex-direction: column;
+}
+
+.post-media img {
+  border-radius: 15px;
 }
 
 .post-info h3 {
@@ -40,10 +75,185 @@
   line-height: 1.5;
   white-space: pre-wrap;
   text-align: start;
+  max-height: 100px;
+  overflow: hidden;
+  position: relative;
+  transition: max-height 0.3s ease-out;
+}
+
+.post-content.expanded {
+  max-height: none;
+}
+
+/* Only show gradient when content can be expanded and is not expanded */
+.post-content.can-expand:not(.expanded)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(transparent, white);
+  pointer-events: none;
+}
+
+.show-more-button {
+  background: none;
+  border: none;
+  color: #646cff;
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.show-more-button:hover {
+  color: #535bf2;
+}
+
+.show-more-button:focus {
+  outline: none;
 }
 
 .post-footer {
-  margin-top: 1rem;
   font-size: 0.8rem;
   color: #666;
+}
+
+@keyframes burn {
+  0% {
+    opacity: 1;
+    background: rgb(255, 255, 255);
+    border-color: transparent;
+  }
+  75% {
+    opacity: 1;
+    background: #646cff;
+  }
+  100% {
+    opacity: 0;
+    background: #646cff;
+  }
+}
+
+@keyframes burnData {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes alert-color {
+  0%,
+  100% {
+    color: #1b003f;
+  }
+  50% {
+    color: #9b22eb;
+  }
+}
+
+.post.expires-soon .post-footer span {
+  animation: alert-color 1s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  font-weight: bold;
+}
+
+.post.burning {
+  animation: burn 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  pointer-events: none;
+  transition: all 0.5s ease-out;
+}
+
+.burning .post-header,
+.burning .post-content,
+.burning .post-footer {
+  animation: burnData 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+}
+
+.burning-overlay {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  z-index: -1; /* Changed from 1 to -1 */
+  gap: 1rem;
+  opacity: 100%;
+  pointer-events: none;
+}
+.burning-overlay.hidden {
+  display: none;
+}
+
+.fire {
+  position: relative;
+  width: 100%;
+  height: auto;
+  background-color: transparent;
+  z-index: -1; /* Changed from 1 to -1 */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.5;
+}
+
+.flame1,
+.flame2,
+.flame3 {
+  z-index: -1; /* Changed from positive values to -1 */
+}
+
+.post.expires-soon::before,
+.post.expires-soon::after {
+  z-index: -2; /* Put these elements behind everything */
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(1px) translateY(-0.5px) rotate(0.2deg);
+  }
+  50% {
+    transform: translateX(-1px) translateY(0.5px) rotate(-0.2deg);
+  }
+}
+@keyframes flame {
+  0%,
+  100% {
+    opacity: 100%;
+  }
+  50% {
+    opacity: 75%;
+  }
+}
+
+.fire img {
+  width: 350px;
+  height: auto;
+  margin-inline: -3rem;
+  filter: drop-shadow(0 0 35px #646cff);
+}
+
+.flame1 {
+  z-index: 1;
+  animation: flame 3s ease-in-out infinite, shake 1s ease-in-out infinite;
+}
+
+.flame2 {
+  z-index: 2;
+  animation: flame 5s ease-in-out infinite, shake 1s ease-in-out infinite;
+}
+
+.flame3 {
+  z-index: 1;
+  animation: flame 7s ease-in-out infinite, shake 1s ease-in-out infinite;
 }

@@ -6,9 +6,10 @@ interface PostAttributes {
   id?: number;
   content: string;
   user_id: number;
-  expires_at?: Date;
+  expires_at: Date;
   created_at?: Date;
   updated_at?: Date;
+  media?: string;
 }
 
 export class Post extends Model<PostAttributes> implements PostAttributes {
@@ -16,8 +17,9 @@ export class Post extends Model<PostAttributes> implements PostAttributes {
   public content!: string;
   public user_id!: number;
   public expires_at!: Date;
-  public readonly created_at!: Date;
-  public readonly updated_at!: Date;
+  public created_at!: Date;
+  public updated_at!: Date;
+  public media!: string;
 }
 
 Post.init(
@@ -38,39 +40,27 @@ Post.init(
         model: User,
         key: "id",
       },
-      field: "user_id", // Specify the snake_case field name
     },
     expires_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      field: "expires_at", // Specify the snake_case field name
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      field: "created_at", // Specify the snake_case field name
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      field: "updated_at", // Specify the snake_case field name
+    media: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
   },
   {
     sequelize,
     tableName: "posts",
     timestamps: true,
-    underscored: true, // This will convert created_at to created_at, etc.
+    underscored: true, // This ensures created_at instead of createdAt
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   }
 );
 
-Post.belongsTo(User, {
-  foreignKey: "user_id",
-  as: "User", // Add this line
-});
-User.hasMany(Post, {
-  foreignKey: "user_id",
-  as: "posts", // Add this line
-});
+Post.belongsTo(User, { foreignKey: "user_id", as: "User" });
+User.hasMany(Post, { foreignKey: "user_id", as: "posts" });
 
 export default Post;
