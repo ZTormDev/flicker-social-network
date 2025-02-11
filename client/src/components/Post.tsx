@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/post.css";
+import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface PostProps {
   post: {
@@ -24,10 +26,85 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [showShowMore, setShowShowMore] = useState(false);
-  const maxHeight = 100; // Height in pixels before truncating
+  const maxHeight = 150; // Height in pixels before truncating
 
   const [isVisible, setIsVisible] = useState(false);
   const postRef = useRef<HTMLDivElement>(null);
+
+  // Add this state at the beginning of your Post component
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  // Add these new states at the beginning of your Post component
+  const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(
+    null
+  );
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const nextMedia = () => {
+    if (isAnimating) return;
+    setSlideDirection("left");
+    setIsAnimating(true);
+
+    // Pause current video if it exists
+    const currentVideo = document.querySelector(
+      `[data-post-id="${post.id}"] .media-slide.active video`
+    ) as HTMLVideoElement | null;
+    if (currentVideo) {
+      currentVideo.pause();
+    }
+
+    setCurrentMediaIndex((prev) => {
+      const nextIndex =
+        prev === (post.media?.length || 0) - 1 ? prev : prev + 1;
+
+      // After state update, play next video if it exists
+      setTimeout(() => {
+        const nextVideo = document.querySelector(
+          `[data-post-id="${post.id}"] .media-slide[data-index="${nextIndex}"] video`
+        ) as HTMLVideoElement | null;
+        if (nextVideo) {
+          nextVideo.currentTime = 0;
+          nextVideo.play();
+        }
+      }, 0);
+
+      return nextIndex;
+    });
+
+    setIsAnimating(false);
+  };
+
+  const previousMedia = () => {
+    if (isAnimating) return;
+    setSlideDirection("right");
+    setIsAnimating(true);
+
+    // Pause current video if it exists
+    const currentVideo = document.querySelector(
+      `[data-post-id="${post.id}"] .media-slide.active video`
+    ) as HTMLVideoElement | null;
+    if (currentVideo) {
+      currentVideo.pause();
+    }
+
+    setCurrentMediaIndex((prev) => {
+      const prevIndex = prev === 0 ? prev : prev - 1;
+
+      // After state update, play previous video if it exists
+      setTimeout(() => {
+        const prevVideo = document.querySelector(
+          `[data-post-id="${post.id}"] .media-slide[data-index="${prevIndex}"] video`
+        ) as HTMLVideoElement | null;
+        if (prevVideo) {
+          prevVideo.currentTime = 0;
+          prevVideo.play();
+        }
+      }, 0);
+
+      return prevIndex;
+    });
+
+    setIsAnimating(false);
+  };
 
   useEffect(() => {
     if (contentRef.current) {
@@ -129,9 +206,10 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
   return (
     <div
       ref={postRef}
-      className={`post ${isBurning ? "burning" : ""}${
+      data-post-id={post.id}
+      className={`post ${isBurning ? "burning" : ""} ${
         isExpiringSoon() ? "expires-soon" : ""
-      }${isVisible ? "visible" : ""}`}
+      } ${isVisible ? "visible" : ""}`}
     >
       <div className="post-header">
         <img
@@ -144,12 +222,111 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
           <span className="timestamp">{formatDate(post.created_at)}</span>
         </div>
       </div>
+      {post.media && post.media.length > 0 && (
+        <div className="post-media-carousel">
+          <div className="media-container">
+            {post.media.length > 1 && (
+              <div className="media-index">
+                {currentMediaIndex + 1}/{post.media.length}
+              </div>
+            )}
+
+            {post.media.map((media, index) => (
+              <div
+                key={index}
+                data-index={index} // Add this attribute
+                className={`media-slide ${
+                  index === currentMediaIndex ? "active" : ""
+                } ${
+                  index === currentMediaIndex + 1
+                    ? "right"
+                    : index === currentMediaIndex - 1
+                    ? "left"
+                    : ""
+                } ${
+                  slideDirection && Math.abs(index - currentMediaIndex) === 1
+                    ? index > currentMediaIndex
+                      ? "right"
+                      : "left"
+                    : ""
+                }`}
+                style={{
+                  display:
+                    Math.abs(index - currentMediaIndex) <= 1 ? "block" : "none",
+                }}
+              >
+                {media.endsWith(".mp4") ? (
+                  <video src={`http://localhost:5000/${media}`} controls />
+                ) : (
+                  <img
+                    src={`http://localhost:5000/${media}`}
+                    alt={`Media ${index + 1}`}
+                    loading="lazy"
+                  />
+                )}
+              </div>
+            ))}
+
+            {post.media.length > 1 && (
+              <>
+                <button
+                  className="carousel-button prev"
+                  onClick={previousMedia}
+                  disabled={currentMediaIndex === 0 || isAnimating}
+                >
+                  <FontAwesomeIcon icon={faAngleLeft} />
+                </button>
+                <button
+                  className="carousel-button next"
+                  onClick={nextMedia}
+                  disabled={
+                    currentMediaIndex === post.media.length - 1 || isAnimating
+                  }
+                >
+                  <FontAwesomeIcon icon={faAngleRight} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Rest of the dots navigation remains the same */}
+          {post.media.length > 1 && (
+            <div className="media-dots">
+              {post.media.map((_, index) => (
+                <button
+                  key={index}
+                  className={`dot ${
+                    index === currentMediaIndex ? "active" : ""
+                  }`}
+                  onClick={() => {
+                    if (isAnimating) return;
+                    const direction =
+                      index > currentMediaIndex ? "left" : "right";
+                    setSlideDirection(direction);
+                    setIsAnimating(true);
+                    setTimeout(() => {
+                      setCurrentMediaIndex(index);
+                      setIsAnimating(false);
+                    }, 300);
+                  }}
+                  disabled={isAnimating}
+                  aria-label={`Go to media ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <div
         ref={contentRef}
         className={`post-content ${isExpanded ? "expanded" : ""} ${
           showShowMore ? "can-expand" : ""
         }`}
       >
+        {post.media && post.media.length > 0 && (
+          <b>{post.user?.username || "Unknown User"} </b>
+        )}
         {post.content}
       </div>
       {showShowMore && (
@@ -160,25 +337,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
           {isExpanded ? "Show less" : "Show more"}
         </button>
       )}
-      {post.media && post.media.length > 0 && (
-        <div className="post-media">
-          {post.media.map((mediaUrl, index) => (
-            <div key={index} className="media-item">
-              {mediaUrl.endsWith(".mp4") ? (
-                <video
-                  src={`https://xq1jpm39-5000.brs.devtunnels.ms/${mediaUrl}`}
-                  controls
-                />
-              ) : (
-                <img
-                  src={`https://xq1jpm39-5000.brs.devtunnels.ms/${mediaUrl}`}
-                  alt="Media"
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+
       <div className="post-footer">
         <span className={isExpiringSoon() ? "expires-soon" : ""}>
           {timeLeft === "Expired" ? "" : `Burns in: ${timeLeft} 🔥`}

@@ -6,12 +6,9 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://xq1jpm39-5000.brs.devtunnels.ms",
+        target: "http://localhost:5000",
         changeOrigin: true,
         secure: false,
-        headers: {
-          Origin: "https://xq1jpm39-5173.brs.devtunnels.ms",
-        },
       },
     },
   },

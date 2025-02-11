@@ -16,18 +16,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
     try {
       console.log("Attempting login...");
-      const response = await fetch(
-        "https://xq1jpm39-5000.brs.devtunnels.ms/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ emailOrUsername, password }),
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ emailOrUsername, password }),
+      });
 
       console.log("Response status:", response.status);
 

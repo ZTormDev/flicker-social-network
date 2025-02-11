@@ -18,14 +18,11 @@ interface PostType {
 
 const findUser = async (id: number) => {
   try {
-    const response = await fetch(
-      `https://xq1jpm39-5000.brs.devtunnels.ms/api/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     if (!response.ok) {
       console.error(`Error fetching user ${id}: ${response.status}`);
       return { username: "Unknown User", userimage: "" };
@@ -77,7 +74,7 @@ const Feed: React.FC = () => {
   const fetchPosts = async (pageNumber: number) => {
     try {
       const response = await fetch(
-        `https://xq1jpm39-5000.brs.devtunnels.ms/api/posts?page=${pageNumber}&limit=5`,
+        `http://localhost:5000/api/posts?page=${pageNumber}&limit=5`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -127,16 +124,13 @@ const Feed: React.FC = () => {
         });
       }
 
-      const response = await fetch(
-        "https://xq1jpm39-5000.brs.devtunnels.ms/api/posts",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
