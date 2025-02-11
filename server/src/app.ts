@@ -8,6 +8,8 @@ import { sequelize } from "./config/database";
 import cron from "node-cron";
 import { Post } from "./models/Post";
 import { Op } from "sequelize";
+import followsRoutes from "./routes/followsRoutes";
+import searchRoutes from "./routes/searchRoutes";
 
 dotenv.config();
 
@@ -31,7 +33,9 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/follows", followsRoutes);
 app.use("/uploads", express.static("uploads"));
+app.use("/api/search", searchRoutes);
 
 // Database connection and server start
 const startServer = async () => {

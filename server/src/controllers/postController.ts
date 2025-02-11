@@ -4,6 +4,8 @@ import { User } from "../models/User";
 import { Op } from "sequelize";
 import multer from "multer";
 import path from "path";
+import { compressVideo } from "../utils/videoCompressor";
+import fs from "fs/promises";
 
 // Add interface for the Post with User included
 interface PostWithUser extends Post {
@@ -81,28 +83,38 @@ export const getPosts = async (
 };
 
 export const createPost = [
-  upload.array("media", 5), // Limit to 5 files
+  upload.array("media", 20),
   async (req: Request, res: Response): Promise<Response> => {
     try {
       const { content } = req.body;
       const user_id = req.user_id;
+      const files = req.files as Express.Multer.File[];
 
       if (!user_id) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const expires_at = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
-      //const expires_at = new Date(Date.now() + 80 * 1000); // 24 hours from now
+      // Process each file
+      const processedFiles = await Promise.all(
+        files.map(async (file) => {
+          if (file.mimetype.startsWith("video/")) {
+            // Compress video and get new path
+            const compressedPath = await compressVideo(file.path);
+            // Delete original file
+            await fs.unlink(file.path);
+            return compressedPath;
+          }
+          return file.path;
+        })
+      );
 
-      // Handle media files
-      const mediaFiles = (req.files as Express.Multer.File[]) || [];
-      const mediaPaths = mediaFiles.map((file) => file.path);
+      const expires_at = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
       const post = await Post.create({
         content,
         user_id,
         expires_at,
-        media: mediaPaths.length > 0 ? mediaPaths.join(",") : undefined,
+        media: processedFiles.length > 0 ? processedFiles.join(",") : undefined,
       });
 
       const createdPost = await Post.findOne({
@@ -138,6 +150,30 @@ export const createPost = [
     } catch (error) {
       console.error("Error creating post:", error);
       return res.status(500).json({ message: "Error creating post" });
+    }
+  },
+];
+
+// Add a new endpoint for video compression preview
+export const compressVideoPreview = [
+  upload.single("video"),
+  async (req: Request, res: Response): Promise<Response> => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No video file provided" });
+      }
+
+      const compressedPath = await compressVideo(req.file.path);
+      // Delete original file
+      await fs.unlink(req.file.path);
+
+      return res.json({
+        path: compressedPath,
+        url: `http://localhost:5000/${compressedPath}`,
+      });
+    } catch (error) {
+      console.error("Error compressing video:", error);
+      return res.status(500).json({ message: "Error compressing video" });
     }
   },
 ];

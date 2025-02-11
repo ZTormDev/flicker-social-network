@@ -16,7 +16,6 @@
   padding: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   position: relative;
-  overflow: hidden;
   box-sizing: border-box;
   z-index: 1;
   transition: all 0.5s ease;
@@ -24,6 +23,8 @@
   opacity: 0;
   transform: translateY(20px);
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
   flex-direction: column;
   gap: 10px;
 }
@@ -31,11 +32,6 @@
 .post.visible {
   opacity: 1;
   transform: translateY(0);
-}
-
-.post * {
-  z-index: 2;
-  position: relative;
 }
 
 .post-header {
@@ -272,7 +268,7 @@
   border-radius: 8px;
   overflow: hidden;
   aspect-ratio: 1/1;
-  background-color: transparent;
+  background: linear-gradient(45deg, rgb(204, 204, 204), rgb(241, 241, 241));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -296,7 +292,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 15px;
   color: white;
   width: 10px;
   height: auto;
@@ -305,6 +301,7 @@
   opacity: 0;
   backdrop-filter: blur(3px);
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .carousel-button:hover {
@@ -334,12 +331,12 @@
   display: flex;
   justify-content: center;
   gap: 8px;
-  padding: 10px;
+  padding: 8px;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: #ccc;
   border: none;
@@ -421,4 +418,106 @@
   -webkit-backdrop-filter: blur(4px);
   opacity: 1;
   pointer-events: none;
+}
+
+.post-header-container {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-header-actions {
+  position: relative;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: color 0.2s ease;
+  width: 25px;
+  height: 25px;
+  font-size: 1.2rem;
+  padding: 1.2rem;
+}
+
+.menu-button:hover {
+  color: #646cff;
+  background-color: #ebecff;
+}
+
+.post-menu {
+  position: absolute;
+  margin-top: 3px;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.247);
+  z-index: 100;
+  min-width: 150px;
+  padding: 0.5rem;
+  animation: menu-fade-in 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 5px;
+}
+
+.post-menu button {
+  width: 100%;
+}
+
+.post-menu button svg {
+  margin-left: 0.5rem;
+}
+
+.post-menu .report-button {
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.post-menu .report-button:hover {
+  background-color: #fee2e2;
+}
+
+.post-menu .delete-button {
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.post-menu .delete-button:hover {
+  background-color: #fee2e2;
+}
+
+@keyframes menu-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

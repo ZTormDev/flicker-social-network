@@ -5,6 +5,32 @@
   margin-bottom: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   height: auto;
+  position: relative;
+}
+
+.create-post.dragover::after {
+  content: "Drop files here";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(100, 108, 255, 0.1);
+  border: 2px dashed #646cff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #646cff;
+  pointer-events: none;
+}
+
+.create-post.dragover .content-editable,
+.create-post.dragover .media-previews,
+.create-post.dragover .post-actions {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .create-post form {
@@ -27,6 +53,11 @@
   font-size: 1.2rem;
   color: #333;
   position: relative;
+  /* Add these properties for text wrapping */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 .content-editable:empty::before {
@@ -138,4 +169,74 @@
 .media-button:hover {
   background-color: #646cff;
   color: white;
+}
+
+.media-button:disabled,
+.media-button:hover:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.compressing-container {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  background: linear-gradient(0deg, #b1b5ff, #646cff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  animation: bg-loading 1s cubic-bezier(0.19, 1, 0.22, 1) infinite;
+  transition: all cubic-bezier(0.19, 1, 0.22, 1) 1s;
+  border: none;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compressing-container p {
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+}
+
+.animate-spin {
+  animation: spin 1s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.compressing-overlay {
+  background-color: rgba(0, 0, 0, 0);
+  position: fixed;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+@keyframes bg-loading {
+  0%,
+  100% {
+    border-radius: 30px 0px 0px 0px;
+  }
+  25% {
+    border-radius: 0px 30px 0px 0px;
+  }
+  50% {
+    border-radius: 0px 0px 30px 0px;
+  }
+  75% {
+    border-radius: 0px 0px 0px 30px;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

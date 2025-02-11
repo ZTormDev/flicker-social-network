@@ -1,25 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/post.css";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faFlag,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
-interface PostProps {
-  post: {
-    id: number;
-    content: string;
-    user_id: number;
-    user?: {
-      username: string;
-      userimage: string;
-    };
-    created_at?: string; // Make optional
-    expires_at: string;
-    media?: string[];
-  };
-  onDelete?: (id: number) => void;
+// Add these interfaces inside the component file, before the Post component
+interface PostUser {
+  id?: number;
+  username: string;
+  userimage: string;
 }
 
-const Post: React.FC<PostProps> = ({ post, onDelete }) => {
+interface PostWithUser {
+  id: number;
+  content: string;
+  user_id: number; // Make sure this is a number
+  user?: PostUser;
+  created_at?: string;
+  expires_at: string;
+  media?: string[];
+}
+// Update the PostProps interface
+interface PostProps {
+  post: PostWithUser;
+  onDelete: (id: number) => void;
+  currentUserId: number; // Make sure this is a number
+}
+
+const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeLeft());
   const [isBurning, setIsBurning] = useState(false);
 
@@ -38,6 +51,31 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
     null
   );
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const [showMenu, setShowMenu] = useState(false);
+
+  // Add this function before the return statement
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/posts/${post.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        onDelete(post.id);
+      } else {
+        console.error("Failed to delete post");
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
 
   const nextMedia = () => {
     if (isAnimating) return;
@@ -203,6 +241,22 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
     return timeToExpire > 0 && timeToExpire < 1 * 60 * 1000; // Less than 5 minutes
   };
 
+  // Add this effect to handle clicking outside the menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showMenu &&
+        postRef.current &&
+        !postRef.current.contains(event.target as Node)
+      ) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showMenu]);
+
   return (
     <div
       ref={postRef}
@@ -211,15 +265,40 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
         isExpiringSoon() ? "expires-soon" : ""
       } ${isVisible ? "visible" : ""}`}
     >
-      <div className="post-header">
-        <img
-          src={post.user?.userimage}
-          alt={post.user?.username || "Default User"}
-          className="avatar"
-        />
-        <div className="post-info">
-          <h3>{post.user?.username || "Unknown User"}</h3>
-          <span className="timestamp">{formatDate(post.created_at)}</span>
+      <div className="post-header-container">
+        <div className="post-header">
+          <img
+            src={post.user?.userimage}
+            alt={post.user?.username || "Default User"}
+            className="avatar"
+          />
+          <div className="post-info">
+            <h3>{post.user?.username || "Unknown User"}</h3>
+            <span className="timestamp">{formatDate(post.created_at)}</span>
+          </div>
+        </div>
+        <div className="post-header-actions">
+          <button
+            className="menu-button"
+            onClick={() => {
+              setShowMenu(!showMenu);
+            }}
+            aria-label="Post menu"
+          >
+            <FontAwesomeIcon icon={faEllipsisV} />
+          </button>
+          {showMenu && (
+            <div className="post-menu">
+              <button className="report-button">
+                Report <FontAwesomeIcon icon={faFlag} />
+              </button>
+              {Number(post.user_id) === Number(currentUserId) && (
+                <button onClick={handleDelete} className="delete-button">
+                  Delete <FontAwesomeIcon icon={faTrash} />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
       {post.media && post.media.length > 0 && (
@@ -255,7 +334,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
                     Math.abs(index - currentMediaIndex) <= 1 ? "block" : "none",
                 }}
               >
-                {media.endsWith(".mp4") ? (
+                {media.endsWith(".mp4") || media.endsWith(".webm") ? (
                   <video src={`http://localhost:5000/${media}`} controls />
                 ) : (
                   <img
@@ -317,7 +396,6 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
           )}
         </div>
       )}
-
       <div
         ref={contentRef}
         className={`post-content ${isExpanded ? "expanded" : ""} ${
@@ -337,7 +415,6 @@ const Post: React.FC<PostProps> = ({ post, onDelete }) => {
           {isExpanded ? "Show less" : "Show more"}
         </button>
       )}
-
       <div className="post-footer">
         <span className={isExpiringSoon() ? "expires-soon" : ""}>
           {timeLeft === "Expired" ? "" : `Burns in: ${timeLeft} 🔥`}

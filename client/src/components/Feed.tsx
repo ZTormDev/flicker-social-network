@@ -71,6 +71,35 @@ const Feed: React.FC = () => {
     [loading, hasMore]
   );
 
+  // Add state for current user at the top of the Feed component
+  const [currentUserId, setCurrentUserId] = useState<number | undefined>(
+    undefined
+  );
+
+  // Add this effect after the existing useEffect hooks
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/users/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const userData = await response.json();
+          setCurrentUserId(userData.id);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
   const fetchPosts = async (pageNumber: number) => {
     try {
       const response = await fetch(
@@ -161,12 +190,22 @@ const Feed: React.FC = () => {
             if (posts.length === index + 1) {
               return (
                 <div ref={lastPostElementRef} key={post.id}>
-                  <Post post={post} onDelete={handleDeletePost} />
+                  <Post
+                    key={post.id}
+                    post={post}
+                    onDelete={handleDeletePost}
+                    currentUserId={currentUserId}
+                  />
                 </div>
               );
             } else {
               return (
-                <Post key={post.id} post={post} onDelete={handleDeletePost} />
+                <Post
+                  key={post.id}
+                  post={post}
+                  onDelete={handleDeletePost}
+                  currentUserId={currentUserId}
+                />
               );
             }
           })

@@ -4,6 +4,13 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import HomePage from "./components/HomePage";
 import LoadingScreen from "./components/LoadingScreen";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import SearchResults from "./components/SearchResults";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -15,10 +22,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
-
-      // Minimum loading time of 2 seconds
       await new Promise((resolve) => setTimeout(resolve, minimunLoadingTime));
-
       setIsLoggedIn(!!token);
       setIsLoading(false);
     };
@@ -29,8 +33,6 @@ function App() {
   const handleLogout = () => {
     setIsLoading(true);
     localStorage.removeItem("token");
-
-    // Show loading screen for 2 seconds before logging out
     setTimeout(() => {
       setIsLoggedIn(false);
       setIsLoading(false);
@@ -44,8 +46,6 @@ function App() {
   const handleRegistrationSuccess = () => {
     setIsLoading(true);
     setShowRegister(false);
-
-    // Show loading screen for 2 seconds after registration
     setTimeout(() => {
       setIsLoggedIn(true);
       setIsLoading(false);
@@ -54,8 +54,6 @@ function App() {
 
   const handleLogin = () => {
     setIsLoading(true);
-
-    // Show loading screen for 2 seconds after login
     setTimeout(() => {
       setIsLoggedIn(true);
       setIsLoading(false);
@@ -67,9 +65,13 @@ function App() {
   }
 
   return (
-    <>
+    <Router>
       {isLoggedIn ? (
-        <HomePage onLogout={handleLogout} />
+        <Routes>
+          <Route path="/" element={<HomePage onLogout={handleLogout} />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       ) : (
         <div
           className={
@@ -93,7 +95,7 @@ function App() {
           )}
         </div>
       )}
-    </>
+    </Router>
   );
 }
 
