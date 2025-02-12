@@ -8,7 +8,6 @@ interface PostAttributes {
   user_id: number;
   expires_at: Date;
   created_at?: Date;
-  updated_at?: Date;
   media?: string;
 }
 
@@ -18,7 +17,6 @@ export class Post extends Model<PostAttributes> implements PostAttributes {
   public user_id!: number;
   public expires_at!: Date;
   public created_at!: Date;
-  public updated_at!: Date;
   public media!: string;
 }
 
@@ -45,6 +43,10 @@ Post.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
     media: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -53,10 +55,8 @@ Post.init(
   {
     sequelize,
     tableName: "posts",
-    timestamps: true,
-    underscored: true, // This ensures created_at instead of createdAt
-    createdAt: "created_at",
-    updatedAt: "updated_at",
+    timestamps: false,
+    underscored: true,
   }
 );
 

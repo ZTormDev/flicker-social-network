@@ -23,7 +23,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onSubmit }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() && mediaFiles.length === 0) return;
+    if (!content.trim() && mediaFiles.length == 0) return;
 
     setIsSubmitting(true);
     try {
@@ -113,7 +113,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onSubmit }) => {
   const handleInput = () => {
     if (editorRef.current) {
       const text = editorRef.current.innerHTML;
-      const isEmpty = !text || text.replace(/<br\s*\/?>/g, "").trim() === "";
+      const isEmpty = !text || text.replace(/<br\s*\/?>/g, "").trim() == "";
 
       if (isEmpty) {
         editorRef.current.innerHTML = "";
@@ -123,7 +123,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onSubmit }) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key == "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
@@ -282,8 +282,8 @@ const CreatePost: React.FC<CreatePostProps> = ({ onSubmit }) => {
             disabled={
               isSubmitting ||
               isCompressing ||
-              (content.replace(/<br\s*\/?>/g, "").trim() === "" &&
-                mediaFiles.length === 0)
+              (content.replace(/<br\s*\/?>/g, "").trim() == "" &&
+                mediaFiles.length == 0)
             }
           >
             {isSubmitting ? "Posting..." : "Post"}

@@ -4,7 +4,6 @@ export interface User {
   email: string;
   password: string;
   created_at: Date;
-  updated_at: Date;
 }
 
 export interface Post {
@@ -13,7 +12,6 @@ export interface Post {
   title: string;
   content: string;
   created_at: Date;
-  updated_at: Date;
 }
 
 export interface AuthResponse {

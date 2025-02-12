@@ -50,7 +50,21 @@ const addUserDataToPosts = async (posts: PostType[]) => {
   );
 };
 
-const Feed: React.FC = () => {
+interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  userImage: string;
+  followers: number; // Add these fields
+  following: number; // Add these fields
+}
+
+interface FeedProps {
+  profile: UserProfile;
+  onFollowUpdate: (isFollowing: boolean) => void;
+}
+
+const Feed: React.FC<FeedProps> = ({ profile, onFollowUpdate }) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,35 +84,6 @@ const Feed: React.FC = () => {
     },
     [loading, hasMore]
   );
-
-  // Add state for current user at the top of the Feed component
-  const [currentUserId, setCurrentUserId] = useState<number | undefined>(
-    undefined
-  );
-
-  // Add this effect after the existing useEffect hooks
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/users/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (response.ok) {
-          const userData = await response.json();
-          setCurrentUserId(userData.id);
-        }
-      } catch (error) {
-        console.error("Error fetching current user:", error);
-      }
-    };
-
-    fetchCurrentUser();
-  }, []);
 
   const fetchPosts = async (pageNumber: number) => {
     try {
@@ -123,7 +108,7 @@ const Feed: React.FC = () => {
       const postsWithUserData = await addUserDataToPosts(data);
 
       setPosts((prevPosts) =>
-        pageNumber === 1
+        pageNumber == 1
           ? postsWithUserData
           : [...prevPosts, ...postsWithUserData]
       );
@@ -183,32 +168,18 @@ const Feed: React.FC = () => {
       <CreatePost onSubmit={handleNewPost} />
       {error && <div className="error-message">{error}</div>}
       <div className="posts-container">
-        {posts.length === 0 && !loading ? (
+        {posts.length == 0 && !loading ? (
           <div className="no-posts">No posts yet</div>
         ) : (
-          posts.map((post, index) => {
-            if (posts.length === index + 1) {
-              return (
-                <div ref={lastPostElementRef} key={post.id}>
-                  <Post
-                    key={post.id}
-                    post={post}
-                    onDelete={handleDeletePost}
-                    currentUserId={currentUserId}
-                  />
-                </div>
-              );
-            } else {
-              return (
-                <Post
-                  key={post.id}
-                  post={post}
-                  onDelete={handleDeletePost}
-                  currentUserId={currentUserId}
-                />
-              );
-            }
-          })
+          posts.map((post) => (
+            <Post
+              key={post.id}
+              post={post}
+              profile={profile}
+              onDelete={handleDeletePost}
+              onFollowUpdate={onFollowUpdate}
+            />
+          ))
         )}
         {loading ? (
           <div className="loading">Loading more posts...</div>

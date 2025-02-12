@@ -8,31 +8,30 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import FollowButton from "./UI/FollowButton";
 
-// Add these interfaces inside the component file, before the Post component
-interface PostUser {
-  id?: number;
-  username: string;
-  userimage: string;
-}
-
-interface PostWithUser {
+interface UserProfile {
   id: number;
-  content: string;
-  user_id: number; // Make sure this is a number
-  user?: PostUser;
-  created_at?: string;
-  expires_at: string;
-  media?: string[];
-}
-// Update the PostProps interface
-interface PostProps {
-  post: PostWithUser;
-  onDelete: (id: number) => void;
-  currentUserId: number; // Make sure this is a number
+  username: string;
+  email: string;
+  userImage: string;
+  followers: number;
+  following: number;
 }
 
-const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
+interface PostProps {
+  post: Post;
+  profile: UserProfile | null;
+  onDelete?: (postId: number) => void;
+  onFollowUpdate: (isFollowing: boolean) => void;
+}
+
+const Post: React.FC<PostProps> = ({
+  post,
+  onDelete,
+  profile,
+  onFollowUpdate,
+}) => {
   const [timeLeft, setTimeLeft] = useState(getTimeLeft());
   const [isBurning, setIsBurning] = useState(false);
 
@@ -91,8 +90,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
     }
 
     setCurrentMediaIndex((prev) => {
-      const nextIndex =
-        prev === (post.media?.length || 0) - 1 ? prev : prev + 1;
+      const nextIndex = prev == (post.media?.length || 0) - 1 ? prev : prev + 1;
 
       // After state update, play next video if it exists
       setTimeout(() => {
@@ -125,7 +123,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
     }
 
     setCurrentMediaIndex((prev) => {
-      const prevIndex = prev === 0 ? prev : prev - 1;
+      const prevIndex = prev == 0 ? prev : prev - 1;
 
       // After state update, play previous video if it exists
       setTimeout(() => {
@@ -177,7 +175,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
       setTimeLeft(newTimeLeft);
 
       // Check if post has expired
-      if (newTimeLeft === "Expired" && !isBurning) {
+      if (newTimeLeft == "Expired" && !isBurning) {
         setIsBurning(true);
         // Wait for burning animation to complete before removing the post
         setTimeout(() => {
@@ -273,7 +271,26 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
             className="avatar"
           />
           <div className="post-info">
-            <h3>{post.user?.username || "Unknown User"}</h3>
+            <div className="username-follow">
+              <h3>{post.user?.username || "Unknown User"}</h3>
+
+              <FollowButton
+                profile={profile}
+                user={{
+                  id: post.user_id,
+                  username: post.user?.username || "",
+                  followers: post.user?.followers || 0,
+                  following: post.user?.following || 0,
+                }}
+                onFollowChange={(newFollowerCount, isFollowing) => {
+                  onFollowUpdate(isFollowing);
+                  // Update local post user data
+                  if (post.user) {
+                    post.user.followers = newFollowerCount;
+                  }
+                }}
+              />
+            </div>
             <span className="timestamp">{formatDate(post.created_at)}</span>
           </div>
         </div>
@@ -292,7 +309,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
               <button className="report-button">
                 Report <FontAwesomeIcon icon={faFlag} />
               </button>
-              {Number(post.user_id) === Number(currentUserId) && (
+              {Number(post.user_id) == Number(profile?.id) && (
                 <button onClick={handleDelete} className="delete-button">
                   Delete <FontAwesomeIcon icon={faTrash} />
                 </button>
@@ -315,15 +332,15 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
                 key={index}
                 data-index={index} // Add this attribute
                 className={`media-slide ${
-                  index === currentMediaIndex ? "active" : ""
+                  index == currentMediaIndex ? "active" : ""
                 } ${
-                  index === currentMediaIndex + 1
+                  index == currentMediaIndex + 1
                     ? "right"
-                    : index === currentMediaIndex - 1
+                    : index == currentMediaIndex - 1
                     ? "left"
                     : ""
                 } ${
-                  slideDirection && Math.abs(index - currentMediaIndex) === 1
+                  slideDirection && Math.abs(index - currentMediaIndex) == 1
                     ? index > currentMediaIndex
                       ? "right"
                       : "left"
@@ -351,7 +368,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
                 <button
                   className="carousel-button prev"
                   onClick={previousMedia}
-                  disabled={currentMediaIndex === 0 || isAnimating}
+                  disabled={currentMediaIndex == 0 || isAnimating}
                 >
                   <FontAwesomeIcon icon={faAngleLeft} />
                 </button>
@@ -359,7 +376,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
                   className="carousel-button next"
                   onClick={nextMedia}
                   disabled={
-                    currentMediaIndex === post.media.length - 1 || isAnimating
+                    currentMediaIndex == post.media.length - 1 || isAnimating
                   }
                 >
                   <FontAwesomeIcon icon={faAngleRight} />
@@ -375,7 +392,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
                 <button
                   key={index}
                   className={`dot ${
-                    index === currentMediaIndex ? "active" : ""
+                    index == currentMediaIndex ? "active" : ""
                   }`}
                   onClick={() => {
                     if (isAnimating) return;
@@ -417,7 +434,7 @@ const Post: React.FC<PostProps> = ({ post, onDelete, currentUserId }) => {
       )}
       <div className="post-footer">
         <span className={isExpiringSoon() ? "expires-soon" : ""}>
-          {timeLeft === "Expired" ? "" : `Burns in: ${timeLeft} 🔥`}
+          {timeLeft == "Expired" ? "" : `Burns in: ${timeLeft} 🔥`}
         </span>
       </div>
       <div className={`burning-overlay ${isExpiringSoon() ? "" : "hidden"}`}>

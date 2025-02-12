@@ -4,12 +4,16 @@ import {
   followUser,
   getFollowers,
   unfollowUser,
+  syncFollowCounts,
+  getFollowing,
 } from "../controllers/followsController";
 
 const router = Router();
 
-router.get("/:id", auth, getFollowers); // Get followers for a user
-router.post("/", auth, followUser); // Follow a user
-router.delete("/:id", auth, unfollowUser); // Unfollow a user
+router.get("/:id", auth, getFollowers);
+router.post("/", auth, followUser);
+router.delete("/:id", auth, unfollowUser);
+router.post("/sync", auth, syncFollowCounts); // Add this route to manually sync counts if needed
+router.get("/following/:id", auth, getFollowing);
 
 export default router;

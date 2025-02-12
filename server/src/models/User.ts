@@ -2,13 +2,14 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
 
 interface UserAttributes {
-  id?: number; // Making id optional
+  id?: number;
   username: string;
   email: string;
   passwordHash: string;
-  userImage?: string; // Add userImage property
+  userImage?: string;
   created_at?: Date;
-  updated_at?: Date;
+  followers: number;
+  following: number;
 }
 
 export class User extends Model<UserAttributes> implements UserAttributes {
@@ -16,9 +17,10 @@ export class User extends Model<UserAttributes> implements UserAttributes {
   public username!: string;
   public email!: string;
   public passwordHash!: string;
-  public userImage!: string; // Add userImage property
+  public userImage!: string;
+  public followers!: number;
+  public following!: number;
   public readonly created_at!: Date;
-  public readonly updated_at!: Date;
 }
 
 User.init(
@@ -44,25 +46,32 @@ User.init(
     passwordHash: {
       type: DataTypes.CHAR(60),
       allowNull: false,
+      field: "password_hash",
     },
     userImage: {
-      // Add userImage property
       type: DataTypes.STRING(255),
-      allowNull: true, // Allow null values for userImage
+      allowNull: true,
+      field: "user_image",
     },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
-    updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+    followers: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    following: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false,
     },
   },
   {
     sequelize,
     tableName: "users",
-    timestamps: true, // Sequelize will handle timestamps automatically
-    underscored: true, // Use snake_case for column names
+    timestamps: false,
+    underscored: true,
   }
 );

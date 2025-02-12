@@ -57,7 +57,7 @@ const startServer = async () => {
 startServer();
 
 // Schedule cron job to delete expired posts
-cron.schedule("0 * * * *", async () => {
+cron.schedule("0 */1 * * *", async () => {
   try {
     const now = new Date();
     await Post.destroy({

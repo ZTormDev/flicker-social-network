@@ -1,0 +1,23 @@
+.follow-button {
+  padding: 0.6rem 0;
+  width: 12rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 10px;
+  border: none;
+}
+.follow-button svg {
+  font-size: 1.2rem;
+}
+
+.follow-button.follow {
+  background-color: #646cff;
+  color: white;
+}
+.follow-button.following {
+  background-color: #e2e2e2;
+  color: #333;
+}

@@ -1,70 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "../styles/sidebar.css";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router-dom"; // Add this import
+import Friends from "./Friends";
 
 interface UserProfile {
   id: number;
   username: string;
   email: string;
   userImage: string;
+  followers: number;
+  following: number;
 }
 
 interface SidebarProps {
-  onLogout: () => void;
+  profile: UserProfile | null;
+  onSearch: (query: string) => void;
+  searchQuery: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/users/profile", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      const data = await response.json();
-      setProfile(data);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-    }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch(e);
-    }
+const Sidebar: React.FC<SidebarProps> = ({
+  profile,
+  onSearch,
+  searchQuery,
+}) => {
+  const handleSearch = (query: string) => {
+    onSearch(query);
   };
 
   return (
     <div className="sidebar-container">
-      <form className="searchbar" onSubmit={handleSearch}>
+      <div className="searchbar">
         <input
           type="text"
           placeholder="Search users, posts, etc..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyPress}
+          onChange={(e) => handleSearch(e.target.value)}
         />
-        <button type="submit" className="search-button">
+        <button className="search-button">
           <FontAwesomeIcon icon={faMagnifyingGlass} />
         </button>
-      </form>
+      </div>
       <div className="sidebar">
         {profile && (
           <div className="profile-section">
@@ -85,13 +61,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
                   </div>
                   <div className="profile-followers">
                     <p>
-                      <b>0</b>
+                      <b>{profile.followers}</b>
                     </p>
                     <p>followers</p>
                   </div>
                   <div className="profile-following">
                     <p>
-                      <b>0</b>
+                      <b>{profile.following}</b>
                     </p>
                     <p>following</p>
                   </div>
@@ -100,12 +76,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
             </div>
           </div>
         )}
-
-        <div className="friends-section">
-          <h2>Friends</h2>
-          <div className="friends-list">a</div>
-        </div>
       </div>
+      <Friends profile={profile} />
     </div>
   );
 };

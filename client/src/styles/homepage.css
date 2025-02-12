@@ -26,6 +26,7 @@
   align-items: center;
   height: 100%;
   animation: logo-animation 5s both infinite;
+  cursor: pointer;
 }
 .navbar-brand h1 {
   font-size: 1.5rem;
@@ -46,6 +47,7 @@
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 2rem;
+  box-sizing: border-box;
 }
 
 .logout-button {
