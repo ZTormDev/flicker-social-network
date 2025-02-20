@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import "../styles/auth.css";
+import "../styles/register.scss";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import FlickerLogoColor from "../assets/flickercolor.png";
 
 interface RegisterProps {
   onRegisterSuccess: () => void;
@@ -9,8 +12,9 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userImage, setUserImage] = useState(""); // Add userImage state
+  const [userImage, setUserImage] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +49,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
         <h2>Register to</h2>
         <div className="auth-logo">
           <h2>Flicker</h2>
-          <img src="flickercolor.png" alt="flicker logo" />
+          <img src={FlickerLogoColor} alt="flicker logo" />
         </div>
       </div>
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -59,6 +63,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            autoComplete="username"
           />
         </div>
         <div className="form-group-register">
@@ -70,18 +75,30 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
           />
         </div>
         <div className="form-group-register">
           <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            placeholder="Password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="password-input-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="password"
+            />
+            <button
+              type="button"
+              className="password-toggle-button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+            </button>
+          </div>
         </div>
         <div className="form-group-register">
           <label htmlFor="userImage">User Image URL:</label>
@@ -91,6 +108,7 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
             id="userImage"
             value={userImage}
             onChange={(e) => setUserImage(e.target.value)}
+            autoComplete="userImage"
           />
         </div>
         <button type="submit">Register</button>

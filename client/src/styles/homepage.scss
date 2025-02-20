@@ -1,0 +1,23 @@
+.homepage-container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  width: 100%;
+}
+
+.main-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  box-sizing: border-box;
+}
+
+.status-indicator.online {
+  background-color: #5fd31c;
+}
+
+.status-indicator.offline {
+  background-color: #969696;
+}

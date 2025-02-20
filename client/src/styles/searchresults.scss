@@ -1,3 +1,5 @@
+@use "./variables.scss" as v;
+
 .search-container {
   width: 100%;
   margin-block: 1rem;
@@ -116,6 +118,12 @@
   gap: 1rem;
   justify-content: space-between;
   align-items: center;
+
+  .view-profile-button {
+    background-color: v.$primary-color;
+    width: auto;
+    text-wrap: nowrap;
+  }
 }
 
 .user-card:hover {

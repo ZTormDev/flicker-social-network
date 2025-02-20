@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Feed from "../components/Feed";
-import "../styles/homepage.css";
+import "../styles/homepage.scss";
 import Sidebar from "../components/SideBar";
 import Header from "../components/Header";
 import SearchResults from "./SearchResults";
@@ -12,6 +12,8 @@ interface UserProfile {
   userImage: string;
   followers: number;
   following: number;
+  isOnline: boolean;
+  lastSeen: string;
 }
 
 interface HomePageProps {
@@ -35,6 +37,32 @@ const HomePage: React.FC<HomePageProps> = ({
       });
     }
   };
+
+  const fetchCurrentProfile = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/users/profile", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+
+      const updatedProfile = await response.json();
+      setProfile(updatedProfile);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentProfile();
+    const intervalId = setInterval(fetchCurrentProfile, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   if (!profile) {
     return;

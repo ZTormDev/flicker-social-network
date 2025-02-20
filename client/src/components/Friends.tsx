@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
-import "../styles/friends.css";
+import React, { useState, useEffect, useRef } from "react";
+import "../styles/friends.scss";
+import { formatLastSeen } from "../utils/dateUtils";
+import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 
 interface UserProfile {
   id: number;
@@ -19,6 +23,8 @@ interface Friend {
     id: string;
     username: string;
     userImage: string;
+    isOnline: boolean;
+    lastSeen: string;
   };
 }
 
@@ -30,6 +36,29 @@ const Friends: React.FC<FriendsProps> = ({ profile }) => {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const navigate = useNavigate();
+  const optionsRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Add this new useEffect after your existing useEffect
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        optionsRef.current &&
+        buttonRef.current &&
+        !optionsRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setSelectedFriend(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchFollowings = async () => {
     try {
@@ -90,9 +119,17 @@ const Friends: React.FC<FriendsProps> = ({ profile }) => {
   };
   useEffect(() => {
     fetchFriends();
-    const intervalId = setInterval(fetchFriends, 500);
+    const intervalId = setInterval(fetchFriends, 5000);
     return () => clearInterval(intervalId);
   }, []);
+
+  const handleFriendClick = (friend: Friend) => {
+    if (selectedFriend && selectedFriend.id == friend.id) {
+      setSelectedFriend(null);
+    } else {
+      setSelectedFriend(friend);
+    }
+  };
 
   if (loading) return <div className="friends-loading">Loading friends...</div>;
   if (error) return <div className="friends-error">{error}</div>;
@@ -105,15 +142,61 @@ const Friends: React.FC<FriendsProps> = ({ profile }) => {
       ) : (
         <div className="friends-list">
           {friends.map((friend) => (
-            <div key={friend.id} className="friend-item">
-              <img
-                src={friend.Follower.userImage || "/default-avatar.png"}
-                alt={friend.Follower.username}
-                className="friend-avatar"
-              />
-              <span className="friend-username">
-                {friend.Follower.username}
-              </span>
+            <div
+              key={friend.id}
+              className={`friend-item ${
+                selectedFriend?.id === friend.id ? "selected" : ""
+              }`}
+            >
+              <div className="friend-avatar-container">
+                <img
+                  src={friend.Follower.userImage || "/default-avatar.png"}
+                  alt={friend.Follower.username}
+                  className="friend-avatar"
+                />
+                <span
+                  className={`status-indicator ${
+                    friend.Follower.isOnline ? "online" : "offline"
+                  }`}
+                />
+              </div>
+              <div className="friend-info">
+                <span className="friend-username">
+                  {friend.Follower.username}
+                </span>
+                <span className="friend-status">
+                  {friend.Follower.isOnline
+                    ? "Online"
+                    : `Online ${formatLastSeen(friend.Follower.lastSeen)}`}
+                </span>
+              </div>
+              <div className="friend-options-container">
+                <button
+                  ref={buttonRef}
+                  className={`friend-options-button ${
+                    selectedFriend?.id === friend.id ? "selected" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFriendClick(friend);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faCaretDown} />
+                </button>
+                {selectedFriend && selectedFriend.id === friend.id && (
+                  <div ref={optionsRef} className="options-container">
+                    <button className="option">Open Chat</button>
+                    <button
+                      className="option"
+                      onClick={() =>
+                        navigate(`/profile/${friend.Follower.username}`)
+                      }
+                    >
+                      View Profile
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

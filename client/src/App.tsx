@@ -11,6 +11,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import SearchResults from "./pages/SearchResults";
+import Profile from "./pages/Profile";
+import NotFound from "./pages/404";
 
 interface UserProfile {
   id: number;
@@ -115,6 +117,66 @@ function App() {
     }, minimunLoadingTime);
   };
 
+  // Update the updateOnlineStatus function to include lastSeen
+  const updateOnlineStatus = async (isOnline: boolean) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      await fetch("http://localhost:5000/api/users/status", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          isOnline,
+          lastSeen: new Date().toISOString(),
+        }),
+      });
+    } catch (error) {
+      console.error("Error updating online status:", error);
+    }
+  };
+
+  // Add event listeners for online/offline status
+  useEffect(() => {
+    const handleOnline = () => updateOnlineStatus(true);
+    const handleOffline = () => updateOnlineStatus(false);
+    const handleBeforeUnload = () => updateOnlineStatus(false);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        updateOnlineStatus(false);
+      } else {
+        updateOnlineStatus(true);
+      }
+    };
+
+    // Add all event listeners
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Set initial online status
+    if (isLoggedIn) {
+      updateOnlineStatus(navigator.onLine);
+    }
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+      // Set offline when component unmounts
+      if (isLoggedIn) {
+        updateOnlineStatus(false);
+      }
+    };
+  }, [isLoggedIn]);
+
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -128,12 +190,22 @@ function App() {
             element={<HomePage onLogout={handleLogout} profile={profile} />}
           />
           <Route
+            path="/profile/:username"
+            element={
+              isLoggedIn ? (
+                <Profile onLogout={handleLogout} thisProfile={profile} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
             path="/search"
             element={
               <SearchResults onLogout={handleLogout} profile={profile} />
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       ) : (
         <div

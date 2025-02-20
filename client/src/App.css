@@ -4,6 +4,9 @@
   padding: 0;
   text-align: left;
   background-color: #646cff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button:focus {

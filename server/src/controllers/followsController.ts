@@ -8,26 +8,22 @@ export const getFollowers = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const userId = req.user_id;
-    if (!userId) {
-      return res.status(400).json({ message: "Invalid user ID" });
-    }
-
+    const { id } = req.params;
     const followers = await Follows.findAll({
-      where: { following_id: userId },
+      where: { following_id: id },
       include: [
         {
           model: User,
-          attributes: ["id", "username", "userImage"],
           as: "Follower",
+          attributes: ["id", "username", "userImage", "isOnline", "lastSeen"],
         },
       ],
     });
 
     return res.json(followers);
   } catch (error) {
-    console.error("Error fetching followers:", error);
-    return res.status(500).json({ message: "Error fetching followers" });
+    console.error("Get followers error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 

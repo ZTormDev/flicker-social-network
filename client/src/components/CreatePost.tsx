@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "../styles/createPost.css";
+import "../styles/createPost.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPhotoFilm,

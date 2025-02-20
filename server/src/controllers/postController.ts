@@ -32,14 +32,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 export const getPosts = async (
-  req: Request,
+  _req: Request,
   res: Response
 ): Promise<Response> => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 5;
-    const offset = (page - 1) * limit;
-
     const now = new Date();
     const posts = await Post.findAll({
       where: {
@@ -55,8 +51,6 @@ export const getPosts = async (
         },
       ],
       order: [["created_at", "DESC"]],
-      limit,
-      offset,
     });
 
     const formattedPosts = posts.map((post) => {
@@ -244,5 +238,52 @@ export const deletePost = async (
   } catch (error) {
     console.error("Error deleting post:", error);
     return res.status(500).json({ message: "Error deleting post" });
+  }
+};
+
+export const getUserPosts = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { userId } = req.params;
+    const now = new Date();
+    const posts = await Post.findAll({
+      where: {
+        user_id: userId,
+        expires_at: {
+          [Op.gt]: now,
+        },
+      },
+      include: [
+        {
+          model: User,
+          attributes: ["username", "userImage"],
+          as: "User",
+        },
+      ],
+      order: [["created_at", "DESC"]],
+    });
+
+    const formattedPosts = posts.map((post) => {
+      const postJson = post.toJSON() as PostWithUser;
+      return {
+        id: postJson.id,
+        content: postJson.content,
+        user_id: postJson.user_id,
+        created_at: postJson.created_at,
+        expires_at: postJson.expires_at,
+        media: postJson.media ? postJson.media.split(",") : [],
+        user: {
+          username: postJson.User?.username || "Unknown User",
+          userimage: postJson.User?.userImage || "",
+        },
+      };
+    });
+
+    return res.json(formattedPosts);
+  } catch (error) {
+    console.error("Error fetching user posts:", error);
+    return res.status(500).json({ message: "Error fetching user posts" });
   }
 };

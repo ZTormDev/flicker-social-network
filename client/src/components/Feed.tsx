@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import CreatePost from "./CreatePost";
 import Post from "./Post";
-import "../styles/feed.css";
+import "../styles/feed.scss";
 
 interface PostType {
   id: number;
@@ -18,7 +18,7 @@ interface PostType {
 
 const findUser = async (id: number) => {
   try {
-    const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+    const response = await fetch(`http://localhost:5000/api/users/id/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -68,64 +68,39 @@ const Feed: React.FC<FeedProps> = ({ profile, onFollowUpdate }) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastPostElementRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
 
-  const fetchPosts = async (pageNumber: number) => {
+  const fetchPosts = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/posts?page=${pageNumber}&limit=5`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/posts", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error("Failed to fetch posts");
       }
 
       const data = await response.json();
-      if (!Array.isArray(data)) {
-        throw new Error("Server response is not an array");
-      }
-
-      const postsWithUserData = await addUserDataToPosts(data);
-
-      setPosts((prevPosts) =>
-        pageNumber == 1
-          ? postsWithUserData
-          : [...prevPosts, ...postsWithUserData]
-      );
-      setHasMore(postsWithUserData.length > 0);
-      setError(null);
+      setPosts(data);
     } catch (error) {
       console.error("Error fetching posts:", error);
-      setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    fetchPosts();
+    const intervalId = setInterval(fetchPosts, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
     setLoading(true);
-    fetchPosts(page);
-  }, [page]);
+    fetchPosts();
+  }, []);
 
   const handleNewPost = async (content: string, media?: File[]) => {
     try {

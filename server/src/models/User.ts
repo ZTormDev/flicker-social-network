@@ -10,6 +10,8 @@ interface UserAttributes {
   created_at?: Date;
   followers: number;
   following: number;
+  isOnline: boolean; // Add this
+  lastSeen: Date; // Add this
 }
 
 export class User extends Model<UserAttributes> implements UserAttributes {
@@ -21,6 +23,8 @@ export class User extends Model<UserAttributes> implements UserAttributes {
   public followers!: number;
   public following!: number;
   public readonly created_at!: Date;
+  public isOnline!: boolean; // Add this line
+  public lastSeen!: Date; // Add this line
 }
 
 User.init(
@@ -65,6 +69,16 @@ User.init(
     following: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+      allowNull: false,
+    },
+    isOnline: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    lastSeen: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
       allowNull: false,
     },
   },

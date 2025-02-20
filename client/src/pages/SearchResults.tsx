@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "../styles/searchresults.css";
+import "../styles/searchresults.scss";
 import Post from "../components/Post";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 interface SearchUser {
   id: number;
   username: string;
@@ -48,6 +49,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   const [posts, setPosts] = useState<SearchPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -157,6 +159,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                     </div>
                   </div>
                 </div>
+                <button
+                  onClick={() => navigate(`/profile/${user.username}`)}
+                  className="view-profile-button"
+                >
+                  View Profile
+                </button>
               </div>
             ))}
           </div>

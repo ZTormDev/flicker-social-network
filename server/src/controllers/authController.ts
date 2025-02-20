@@ -12,29 +12,38 @@ export const register = async (
     const { username, email, password, userImage } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [{ username }, { email }],
+      },
+    });
+
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({
+        message: "Username or email already exists",
+      });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create new user with followers and following initialized to 0
     const user = await User.create({
       username,
       email,
-      passwordHash: hashedPassword,
+      passwordHash,
       userImage,
-      followers: 0, // Add this
-      following: 0, // Add this
+      followers: 0,
+      following: 0,
+      isOnline: true, // Set initial status to online
+      lastSeen: new Date(), // Set initial last seen to current time
     });
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "1d" }
+      { user_id: user.id },
+      process.env.JWT_SECRET || "your-secret-key",
+      {
+        expiresIn: "24h",
+      }
     );
 
     return res.status(201).json({
@@ -49,7 +58,7 @@ export const register = async (
     });
   } catch (error) {
     console.error("Registration error:", error);
-    return res.status(500).json({ message: "Error registering user" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 

@@ -1,0 +1,77 @@
+@use "./variables.scss" as v;
+
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: v.$background-color;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  .not-found-content {
+    text-align: center;
+    background: white;
+    padding: 3rem;
+    border-radius: v.$border-radius;
+    box-shadow: v.$box-shadow;
+    animation: fade-in 0.5s ease-in-out;
+    box-sizing: border-box;
+
+    h1 {
+      font-size: 6rem;
+      color: v.$primary-color;
+      margin: 0;
+      line-height: 1;
+      animation: number-bounce 2s ease infinite;
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: v.$text-color;
+      margin: 1rem 0;
+    }
+
+    p {
+      color: v.$text-muted;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background-color: v.$primary-color;
+      color: white;
+      border: none;
+      border-radius: v.$border-radius-sm;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: darken(v.$primary-color, 10%);
+      }
+    }
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes number-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}

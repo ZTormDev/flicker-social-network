@@ -5,6 +5,7 @@ import {
   getPosts,
   updatePost,
   deletePost,
+  getUserPosts,
 } from "../controllers/postController";
 import { auth } from "../middleware/auth";
 import { compressVideoPreview } from "../controllers/postController";
@@ -15,5 +16,6 @@ router.post("/compress-video", auth, compressVideoPreview);
 router.get("/", getPosts);
 router.put("/:id", auth, updatePost);
 router.delete("/:id", auth, deletePost);
+router.get("/user/:userId", auth, getUserPosts);
 
 export default router;

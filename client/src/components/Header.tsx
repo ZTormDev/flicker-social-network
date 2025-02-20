@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import FlickerLogoColor from "../assets/flickercolor.png";
+import "../styles/header.scss";
 
 interface HeaderProps {
   onLogout: () => void;
@@ -10,7 +12,7 @@ const Header: React.FC<HeaderProps> = ({ onLogout }) => {
     <nav className="navbar">
       <div className="navbar-brand" onClick={() => navigate("/")}>
         <h1>Flicker</h1>
-        <img src="flickercolor.png" alt="flicker logo" />
+        <img src={FlickerLogoColor} alt="flicker logo" />
       </div>
       <button className="logout-button" onClick={onLogout}>
         Logout

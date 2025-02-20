@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import "../styles/auth.css";
+import "../styles/login.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import FlickerLogoColor from "../assets/flickercolor.png";
 
 interface LoginProps {
   onLogin: () => void;
@@ -9,6 +12,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +54,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <h2>Login to</h2>
         <div className="auth-logo">
           <h2>Flicker</h2>
-          <img src="flickercolor.png" alt="flicker logo" />
+          <img src={FlickerLogoColor} alt="flicker logo" />
         </div>
       </div>
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -64,23 +68,34 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             value={emailOrUsername}
             onChange={(e) => setEmailOrUsername(e.target.value)}
             required
+            autoComplete="emailOrUsername"
           />
         </div>
         <div className="form-group-login">
           <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            placeholder="Password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="password-input-container">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="password"
+            />
+            <button
+              type="button"
+              className="password-toggle-button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+            </button>
+          </div>
         </div>
         <button type="submit">Login</button>
       </form>
     </div>
   );
 };
-
 export default Login;

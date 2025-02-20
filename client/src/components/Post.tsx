@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/post.css";
+import "../styles/post.scss";
 import {
   faAngleLeft,
   faAngleRight,
