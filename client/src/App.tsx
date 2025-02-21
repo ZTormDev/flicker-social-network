@@ -19,8 +19,10 @@ interface UserProfile {
   username: string;
   email: string;
   userImage: string;
-  followers: number; // Add these fields
-  following: number; // Add these fields
+  followers: number;
+  following: number;
+  isOnline: boolean; // Añadido
+  lastSeen: string; // Añadido
 }
 
 function App() {
@@ -29,6 +31,37 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const minimunLoadingTime = 3000;
+
+  const sendHeartbeat = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      await fetch("http://localhost:5000/api/users/heartbeat", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Heartbeat error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    // Initial heartbeat
+    sendHeartbeat();
+
+    // Set up heartbeat interval
+    const heartbeatInterval = setInterval(sendHeartbeat, 5000);
+
+    // Cleanup function
+    return () => {
+      clearInterval(heartbeatInterval);
+    };
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -116,66 +149,6 @@ function App() {
       setIsLoading(false);
     }, minimunLoadingTime);
   };
-
-  // Update the updateOnlineStatus function to include lastSeen
-  const updateOnlineStatus = async (isOnline: boolean) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      await fetch("http://localhost:5000/api/users/status", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          isOnline,
-          lastSeen: new Date().toISOString(),
-        }),
-      });
-    } catch (error) {
-      console.error("Error updating online status:", error);
-    }
-  };
-
-  // Add event listeners for online/offline status
-  useEffect(() => {
-    const handleOnline = () => updateOnlineStatus(true);
-    const handleOffline = () => updateOnlineStatus(false);
-    const handleBeforeUnload = () => updateOnlineStatus(false);
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        updateOnlineStatus(false);
-      } else {
-        updateOnlineStatus(true);
-      }
-    };
-
-    // Add all event listeners
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Set initial online status
-    if (isLoggedIn) {
-      updateOnlineStatus(navigator.onLine);
-    }
-
-    // Cleanup function
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-
-      // Set offline when component unmounts
-      if (isLoggedIn) {
-        updateOnlineStatus(false);
-      }
-    };
-  }, [isLoggedIn]);
 
   if (isLoading) {
     return <LoadingScreen />;

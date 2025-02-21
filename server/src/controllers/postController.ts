@@ -6,6 +6,7 @@ import multer from "multer";
 import path from "path";
 import { compressVideo } from "../utils/videoCompressor";
 import fs from "fs/promises";
+import Likes from "../models/Likes";
 
 // Add interface for the Post with User included
 interface PostWithUser extends Post {
@@ -32,7 +33,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 export const getPosts = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<Response> => {
   try {
@@ -53,21 +54,36 @@ export const getPosts = async (
       order: [["created_at", "DESC"]],
     });
 
-    const formattedPosts = posts.map((post) => {
-      const postJson = post.toJSON() as PostWithUser;
-      return {
-        id: postJson.id,
-        content: postJson.content,
-        user_id: postJson.user_id,
-        created_at: postJson.created_at,
-        expires_at: postJson.expires_at,
-        media: postJson.media ? postJson.media.split(",") : [],
-        user: {
-          username: postJson.User?.username || "Unknown User",
-          userimage: postJson.User?.userImage || "",
-        },
-      };
-    });
+    const formattedPosts = await Promise.all(
+      posts.map(async (post) => {
+        const postJson = post.toJSON() as PostWithUser;
+        const likesCount = await Likes.count({ where: { post_id: post.id } });
+
+        // Check if user is authenticated before checking if they liked the post
+        let userLiked = false;
+        if (req.user_id) {
+          const likeExists = await Likes.findOne({
+            where: { post_id: post.id, user_id: req.user_id },
+          });
+          userLiked = !!likeExists;
+        }
+
+        return {
+          id: postJson.id,
+          content: postJson.content,
+          user_id: postJson.user_id,
+          created_at: postJson.created_at,
+          expires_at: postJson.expires_at,
+          media: postJson.media ? postJson.media.split(",") : [],
+          likes: likesCount,
+          userLiked: userLiked,
+          user: {
+            username: postJson.User?.username || "Unknown User",
+            userimage: postJson.User?.userImage || "",
+          },
+        };
+      })
+    );
 
     return res.json(formattedPosts);
   } catch (error) {
@@ -265,21 +281,36 @@ export const getUserPosts = async (
       order: [["created_at", "DESC"]],
     });
 
-    const formattedPosts = posts.map((post) => {
-      const postJson = post.toJSON() as PostWithUser;
-      return {
-        id: postJson.id,
-        content: postJson.content,
-        user_id: postJson.user_id,
-        created_at: postJson.created_at,
-        expires_at: postJson.expires_at,
-        media: postJson.media ? postJson.media.split(",") : [],
-        user: {
-          username: postJson.User?.username || "Unknown User",
-          userimage: postJson.User?.userImage || "",
-        },
-      };
-    });
+    const formattedPosts = await Promise.all(
+      posts.map(async (post) => {
+        const postJson = post.toJSON() as PostWithUser;
+        const likesCount = await Likes.count({ where: { post_id: post.id } });
+
+        // Check if user is authenticated before checking if they liked the post
+        let userLiked = false;
+        if (req.user_id) {
+          const likeExists = await Likes.findOne({
+            where: { post_id: post.id, user_id: req.user_id },
+          });
+          userLiked = !!likeExists;
+        }
+
+        return {
+          id: postJson.id,
+          content: postJson.content,
+          user_id: postJson.user_id,
+          created_at: postJson.created_at,
+          expires_at: postJson.expires_at,
+          media: postJson.media ? postJson.media.split(",") : [],
+          likes: likesCount,
+          userLiked: userLiked,
+          user: {
+            username: postJson.User?.username || "Unknown User",
+            userimage: postJson.User?.userImage || "",
+          },
+        };
+      })
+    );
 
     return res.json(formattedPosts);
   } catch (error) {

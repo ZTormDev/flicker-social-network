@@ -5,6 +5,8 @@
   padding: 1rem;
   transition: all 0.5s ease-in-out;
   height: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .posts-container {
@@ -13,6 +15,8 @@
   gap: 1rem;
   transition: all 0.5s ease-in-out;
   height: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .loading {

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getProfile,
   getUserByUsername,
+  heartbeat,
   updateProfile,
   updateStatus,
 } from "../controllers/userController";
@@ -18,5 +19,8 @@ router.put("/status", auth, updateStatus);
 // Dynamic routes last
 router.get("/username/:username", auth, getUserByUsername);
 router.get("/id/:id", auth, getUserById);
+
+// Add heartbeat endpoint
+router.post("/heartbeat", auth, heartbeat);
 
 export default router;

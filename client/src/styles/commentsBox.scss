@@ -1,0 +1,174 @@
+@use "./variables.scss" as v;
+
+.comment-box {
+  padding: 0rem;
+  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  color: #333;
+  gap: 1rem;
+
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-y: auto;
+    // Set a specific height or use flex-grow
+    flex: 1;
+    min-height: 0; // Important for Firefox
+    height: calc(100% - 60px); // Subtract form height
+    padding-right: 10px;
+    margin-bottom: 1rem;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d1d1d1;
+      border-radius: 4px;
+
+      &:hover {
+        background: #b8b8b8;
+      }
+    }
+
+    .comment-item {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      justify-content: start;
+      align-items: start;
+
+      .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .comment-content {
+        flex: 1;
+        position: relative;
+        font-size: 0.9rem;
+
+        .like-button {
+          position: absolute;
+          right: 0;
+          top: 0;
+          padding: 0rem;
+          background-color: transparent;
+          color: v.$text-color;
+          border: none;
+          transform: translate(0%, 50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          font-size: 1.2rem;
+        }
+
+        .comment-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 1rem;
+        }
+
+        .comment-footer {
+          display: flex;
+          justify-content: start;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+
+          .comment-reply {
+            padding: 0rem;
+            background-color: transparent;
+            color: v.$text-color;
+            font-size: 0.9rem;
+          }
+        }
+
+        .comment-text {
+          color: var(--text-primary);
+          word-break: break-word;
+          text-align: left;
+        }
+      }
+
+      .comment-delete {
+        padding: 0.25rem 0.5rem;
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        height: fit-content;
+
+        &:hover {
+          background-color: var(--danger-color-hover);
+        }
+      }
+    }
+  }
+
+  .comment-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .comment-input {
+      flex: 1;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: none;
+      border-bottom: 1px solid v.$border-color;
+      background-color: var(--background-primary);
+      color: var(--text-primary);
+
+      &:focus {
+        outline: none;
+        border-color: v.$primary-color;
+      }
+    }
+
+    .comment-submit {
+      padding: 0.4rem 1.5rem;
+      border: solid 2px transparent;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: v.$primary-color;
+      color: white;
+      transition: all 0.2s v.$transition-curve;
+
+      &:hover {
+        background-color: transparent;
+        color: v.$primary-color;
+        border-color: v.$primary-color;
+      }
+    }
+  }
+}
+
+.comments-loading,
+.comments-error {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-secondary);
+}
+
+.comments-error {
+  color: var(--danger-color);
+}

@@ -1,4 +1,4 @@
-export const formatLastSeen = (lastSeenDate: string): string => {
+export const formatTimeAgo = (lastSeenDate: string): string => {
   const now = new Date();
   const lastSeen = new Date(lastSeenDate);
   const diffInSeconds = Math.floor((now.getTime() - lastSeen.getTime()) / 1000);

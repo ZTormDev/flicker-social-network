@@ -1,5 +1,19 @@
 import { Request, Response } from "express";
 import { User } from "../models/User";
+import { PresenceService } from "./presenceController";
+
+export const heartbeat = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    await PresenceService.updatePresence(req.user_id);
+    return res.json({ status: "ok" });
+  } catch (error) {
+    console.error("Heartbeat error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const getProfile = async (
   req: Request,
@@ -14,7 +28,11 @@ export const getProfile = async (
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.json(user);
+    // Add real-time online status
+    const userData = user.toJSON();
+    userData.isOnline = PresenceService.isOnline(user.id);
+
+    return res.json(userData);
   } catch (error) {
     console.error("Get profile error:", error);
     return res.status(500).json({ message: "Server error" });

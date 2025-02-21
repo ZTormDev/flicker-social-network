@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/friends.scss";
-import { formatLastSeen } from "../utils/dateUtils";
-import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router-dom";
+import FriendItem from "./FriendItem";
 
 interface UserProfile {
   id: number;
@@ -12,6 +9,8 @@ interface UserProfile {
   userImage: string;
   followers: number;
   following: number;
+  isOnline: boolean;
+  lastSeen: string;
 }
 
 interface Friend {
@@ -20,7 +19,7 @@ interface Friend {
   following_id: number;
   created_at: string;
   Follower: {
-    id: string;
+    id: number; // Cambiado de string a number
     username: string;
     userImage: string;
     isOnline: boolean;
@@ -29,7 +28,7 @@ interface Friend {
 }
 
 interface FriendsProps {
-  profile: UserProfile | null;
+  profile: UserProfile;
 }
 
 const Friends: React.FC<FriendsProps> = ({ profile }) => {
@@ -37,7 +36,6 @@ const Friends: React.FC<FriendsProps> = ({ profile }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  const navigate = useNavigate();
   const optionsRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -142,62 +140,14 @@ const Friends: React.FC<FriendsProps> = ({ profile }) => {
       ) : (
         <div className="friends-list">
           {friends.map((friend) => (
-            <div
+            <FriendItem
               key={friend.id}
-              className={`friend-item ${
-                selectedFriend?.id === friend.id ? "selected" : ""
-              }`}
-            >
-              <div className="friend-avatar-container">
-                <img
-                  src={friend.Follower.userImage || "/default-avatar.png"}
-                  alt={friend.Follower.username}
-                  className="friend-avatar"
-                />
-                <span
-                  className={`status-indicator ${
-                    friend.Follower.isOnline ? "online" : "offline"
-                  }`}
-                />
-              </div>
-              <div className="friend-info">
-                <span className="friend-username">
-                  {friend.Follower.username}
-                </span>
-                <span className="friend-status">
-                  {friend.Follower.isOnline
-                    ? "Online"
-                    : `Online ${formatLastSeen(friend.Follower.lastSeen)}`}
-                </span>
-              </div>
-              <div className="friend-options-container">
-                <button
-                  ref={buttonRef}
-                  className={`friend-options-button ${
-                    selectedFriend?.id === friend.id ? "selected" : ""
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleFriendClick(friend);
-                  }}
-                >
-                  <FontAwesomeIcon icon={faCaretDown} />
-                </button>
-                {selectedFriend && selectedFriend.id === friend.id && (
-                  <div ref={optionsRef} className="options-container">
-                    <button className="option">Open Chat</button>
-                    <button
-                      className="option"
-                      onClick={() =>
-                        navigate(`/profile/${friend.Follower.username}`)
-                      }
-                    >
-                      View Profile
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+              friend={friend}
+              isSelected={selectedFriend?.id === friend.id}
+              onSelect={handleFriendClick}
+              optionsRef={optionsRef}
+              buttonRef={buttonRef}
+            />
           ))}
         </div>
       )}

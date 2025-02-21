@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../styles/profile.scss";
 import Post from "../components/Post";
-import { formatLastSeen } from "../utils/dateUtils";
 import Header from "../components/Header";
 import FollowButton from "../components/UI/FollowButton";
+import { formatTimeAgo } from "../utils/dateUtils";
 
 interface UserProfile {
   id: number;
@@ -17,7 +17,7 @@ interface UserProfile {
   lastSeen: string;
 }
 
-interface Post {
+interface PostInterface {
   id: number;
   content: string;
   user_id: number;
@@ -41,9 +41,35 @@ const Profile: React.FC<ProfileProps> = ({ onLogout, thisProfile }) => {
   const { username } = useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Add this new function to handle follow updates
+  const handleFollowUpdate = () => {
+    if (profile) {
+      setProfile((prevProfile) => {
+        if (!prevProfile) return null;
+        return {
+          ...prevProfile,
+          followers: prevProfile.followers + 1,
+        };
+      });
+    }
+  };
+
+  // Add this new function to handle unfollow updates
+  const handleUnfollowUpdate = () => {
+    if (profile) {
+      setProfile((prevProfile) => {
+        if (!prevProfile) return null;
+        return {
+          ...prevProfile,
+          followers: prevProfile.followers - 1,
+        };
+      });
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -160,7 +186,7 @@ const Profile: React.FC<ProfileProps> = ({ onLogout, thisProfile }) => {
               >
                 {profile.isOnline
                   ? "Online"
-                  : `Online ${formatLastSeen(profile.lastSeen)}`}
+                  : `Online ${formatTimeAgo(profile.lastSeen)}`}
               </span>
               <div className="profile-stats">
                 <div className="stat">
@@ -176,7 +202,21 @@ const Profile: React.FC<ProfileProps> = ({ onLogout, thisProfile }) => {
                   <span className="stat-label">following</span>
                 </div>
               </div>
-              <FollowButton profile={thisProfile} user={profile}></FollowButton>
+              <FollowButton
+                profile={thisProfile}
+                user={profile}
+                onFollowChange={(newFollowerCount, isFollowing) => {
+                  if (profile) {
+                    setProfile((prevProfile) => {
+                      if (!prevProfile) return null;
+                      return {
+                        ...prevProfile,
+                        followers: newFollowerCount,
+                      };
+                    });
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
@@ -193,7 +233,13 @@ const Profile: React.FC<ProfileProps> = ({ onLogout, thisProfile }) => {
                   post={post}
                   profile={profile}
                   onDelete={handleDeletePost}
-                  onFollowUpdate={() => {}}
+                  onFollowUpdate={(isFollowing) => {
+                    if (isFollowing) {
+                      handleFollowUpdate();
+                    } else {
+                      handleUnfollowUpdate();
+                    }
+                  }}
                 />
               ))
             )}

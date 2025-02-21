@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import "../styles/sidebar.scss";
+import "../styles/rightSidebar.scss";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Friends from "./Friends";
-import { formatLastSeen } from "../utils/dateUtils";
+import { formatTimeAgo } from "../utils/dateUtils";
 import { useNavigate } from "react-router-dom";
 
 interface UserProfile {
@@ -30,7 +30,7 @@ interface SidebarProps {
   searchQuery: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
+const RightSidebar: React.FC<SidebarProps> = ({
   profile,
   onSearch,
   searchQuery,
@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     >
                       {profile.isOnline
                         ? "Online"
-                        : `Online ${formatLastSeen(profile.lastSeen)}`}
+                        : `Online ${formatTimeAgo(profile.lastSeen)}`}
                     </span>
                   </div>
                   <div className="profile-stats">
@@ -147,14 +147,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                           alt={post.content}
                         />
                         <span className="post-time">
-                          {formatLastSeen(post.created_at)}
+                          {formatTimeAgo(post.created_at)}
                         </span>
                       </div>
                     ) : (
                       <div className="no-media">
                         <p>{post.content.slice(0, 5)}...</p>
                         <span className="post-time">
-                          {formatLastSeen(post.created_at)}
+                          {formatTimeAgo(post.created_at)}
                         </span>
                       </div>
                     )}
@@ -176,4 +176,4 @@ const Sidebar: React.FC<SidebarProps> = ({
   );
 };
 
-export default Sidebar;
+export default RightSidebar;

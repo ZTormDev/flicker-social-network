@@ -10,6 +10,9 @@ import { Post } from "./models/Post";
 import { Op } from "sequelize";
 import followsRoutes from "./routes/followsRoutes";
 import searchRoutes from "./routes/searchRoutes";
+import likesRoutes from "./routes/likesRoutes";
+import { PresenceService } from "./controllers/presenceController";
+import commentRoutes from "./routes/commentRoutes";
 
 dotenv.config();
 
@@ -34,8 +37,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/follows", followsRoutes);
+app.use("/api/likes", likesRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/search", searchRoutes);
+app.use("/api/comments", commentRoutes);
 
 // Database connection and server start
 const startServer = async () => {
@@ -45,6 +50,10 @@ const startServer = async () => {
 
     await sequelize.sync();
     console.log("Database synchronized");
+
+    // Initialize PresenceService
+    PresenceService.init();
+    console.log("Presence service initialized");
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

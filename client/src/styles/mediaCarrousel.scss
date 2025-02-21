@@ -1,0 +1,161 @@
+.post-media-carousel {
+  margin: 0rem;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1/1;
+
+  .carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #646cffcd;
+    border: none;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: white;
+    width: 10px;
+    height: auto;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+    opacity: 0;
+    backdrop-filter: blur(3px);
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .media-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    background: linear-gradient(45deg, rgb(204, 204, 204), rgb(241, 241, 241));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .media-container img,
+  .media-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .carousel-button:hover {
+    background: #646cff;
+  }
+
+  .carousel-button.prev {
+    left: 10px;
+  }
+
+  .carousel-button.next {
+    right: 10px;
+  }
+
+  .carousel-button:disabled,
+  .carousel-button:disabled:hover {
+    opacity: 0;
+    cursor: default;
+    background-color: transparent;
+    color: transparent;
+  }
+
+  .media-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #ccc;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .dot.active {
+    background-color: #646cff;
+    transform: scale(1.5);
+  }
+
+  /* Animation for media transitions */
+  .media-container img,
+  .media-container video {
+    animation: fadeIn 0.3s ease;
+  }
+
+  &:hover .carousel-button {
+    opacity: 1;
+  }
+
+  /* Update the media slide base styles */
+  .media-slide {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    opacity: 1;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transform: translateX(0);
+  }
+
+  /* Entering from right */
+  .media-slide.right {
+    opacity: 1;
+    transform: translateX(100%);
+  }
+
+  /* Entering from left */
+  .media-slide.left {
+    opacity: 1;
+    transform: translateX(-100%);
+  }
+
+  /* Active slide */
+  .media-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    position: absolute;
+    z-index: 2;
+  }
+
+  /* Remove the fadeIn animation since we're using slide transitions */
+  .media-container img,
+  .media-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .media-index {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #646cffcf;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 100rem;
+    font-size: 0.875rem;
+    z-index: 3;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  .post-media img {
+    border-radius: 15px;
+  }
+}

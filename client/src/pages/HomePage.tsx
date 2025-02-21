@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Feed from "../components/Feed";
 import "../styles/homepage.scss";
-import Sidebar from "../components/SideBar";
+import RightSidebar from "../components/RightSideBar";
 import Header from "../components/Header";
 import SearchResults from "./SearchResults";
+import LeftSidebar from "../components/LeftSideBar";
 
 interface UserProfile {
   id: number;
@@ -72,6 +73,11 @@ const HomePage: React.FC<HomePageProps> = ({
     <div className="homepage-container">
       <Header onLogout={onLogout} />
       <div className="main-content">
+        <LeftSidebar
+          profile={profile}
+          onSearch={setSearchQuery}
+          searchQuery={searchQuery}
+        />
         {searchQuery ? (
           <SearchResults
             profile={profile}
@@ -84,7 +90,7 @@ const HomePage: React.FC<HomePageProps> = ({
             onFollowUpdate={handleFollowUpdate} // Add this prop
           />
         )}
-        <Sidebar
+        <RightSidebar
           profile={profile}
           onSearch={setSearchQuery}
           searchQuery={searchQuery}
