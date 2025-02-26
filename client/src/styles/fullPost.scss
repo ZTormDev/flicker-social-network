@@ -31,16 +31,28 @@
 
   .fullpost {
     position: relative;
-    max-width: 1200px;
+    width: 1200px;
     box-sizing: border-box;
     display: grid;
-    justify-content: flex-start;
-    align-items: flex-start;
-    grid-template-columns: 3fr 2fr;
-    height: 100%;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: 560px 400px;
+    height: 850px;
     gap: 1rem;
-    padding: 5rem;
+    padding: 3rem;
     animation: showPost 0.5s v.$transition-curve;
+    scale: 1;
+
+    @media (max-width: 1000px) {
+      scale: 0.85;
+    }
+
+    @media (max-height: 800px) {
+      scale: 0.85;
+    }
+    @media (max-height: 700px) {
+      scale: 0.75;
+    }
   }
 
   @keyframes showPost {
@@ -81,15 +93,16 @@
     width: 100%;
     height: 100%;
 
+    &.no-media {
+      height: auto;
+    }
+
     .post-content {
       overflow: visible;
     }
 
     .post-footer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      margin: 1rem;
+      position: relative;
     }
     // Move post actions outside of content scroll area
     .post-actions {
@@ -204,10 +217,9 @@
     align-items: flex-start;
     flex-direction: column;
     gap: 15px;
-    width: 100%;
     height: 100%;
     overflow: hidden;
-    min-width: 400px;
+    width: 100%;
 
     .post-content-container {
       display: flex;

@@ -13,6 +13,9 @@ import searchRoutes from "./routes/searchRoutes";
 import likesRoutes from "./routes/likesRoutes";
 import { PresenceService } from "./controllers/presenceController";
 import commentRoutes from "./routes/commentRoutes";
+import chatsRoutes from "./routes/chatsRoutes";
+import messagesRoutes from "./routes/messagesRoutes";
+import "./models/associations";
 
 dotenv.config();
 
@@ -41,6 +44,8 @@ app.use("/api/likes", likesRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/search", searchRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/chats", chatsRoutes);
+app.use("/api/messages", messagesRoutes);
 
 // Database connection and server start
 const startServer = async () => {

@@ -16,17 +16,53 @@ interface PostWithUser extends Post {
   };
 }
 
-// Configure multer for media uploads
+// Add this helper function at the top of the file after the imports
+const getUniqueFilename = async (originalPath: string): Promise<string> => {
+  let counter = 1;
+  let uniquePath = originalPath;
+
+  while (true) {
+    try {
+      await fs.access(uniquePath);
+      // File exists, try next number
+      const ext = path.extname(originalPath);
+      const nameWithoutExt = originalPath.slice(0, -ext.length);
+      uniquePath = `${nameWithoutExt}(${counter})${ext}`;
+      counter++;
+    } catch {
+      // File doesn't exist, we can use this name
+      return uniquePath;
+    }
+  }
+};
+
+// Modify the storage configuration
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, "uploads/");
   },
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(
-      null,
-      `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`
-    );
+  filename: async (_req, file, cb) => {
+    const date = new Date();
+    const formatedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}_${date
+      .getHours()
+      .toString()
+      .padStart(2, "0")}.${date.getMinutes().toString().padStart(2, "0")}.${date
+      .getSeconds()
+      .toString()
+      .padStart(2, "0")}`;
+    const uniqueSuffix = `${formatedDate}-flicker`;
+    const originalFilename = `${uniqueSuffix}-${file.fieldname}${path.extname(
+      file.originalname
+    )}`;
+
+    try {
+      const uniquePath = await getUniqueFilename(originalFilename);
+      cb(null, path.basename(uniquePath));
+    } catch (error) {
+      cb(error as Error, originalFilename);
+    }
   },
 });
 
@@ -93,7 +129,14 @@ export const getPosts = async (
 };
 
 export const createPost = [
-  upload.array("media", 20),
+  (req: Request, res: Response, next: Function) => {
+    upload.array("media", 20)(req, res, (err: any) => {
+      if (err) {
+        return res.status(400).json({ message: "Error uploading files" });
+      }
+      return next();
+    });
+  },
   async (req: Request, res: Response): Promise<Response> => {
     try {
       const { content } = req.body;
@@ -107,14 +150,21 @@ export const createPost = [
       // Process each file
       const processedFiles = await Promise.all(
         files.map(async (file) => {
-          if (file.mimetype.startsWith("video/")) {
-            // Compress video and get new path
-            const compressedPath = await compressVideo(file.path);
-            // Delete original file
-            await fs.unlink(file.path);
-            return compressedPath;
+          try {
+            if (file.mimetype.startsWith("video/")) {
+              // Compress video and get new path
+              const compressedPath = await compressVideo(file.path);
+              // Delete original file
+              await fs.unlink(file.path);
+              return compressedPath;
+            }
+            return file.path;
+          } catch (error) {
+            console.error("Error processing file:", error);
+            // Delete the failed file
+            await fs.unlink(file.path).catch(console.error);
+            throw error;
           }
-          return file.path;
         })
       );
 
@@ -160,30 +210,6 @@ export const createPost = [
     } catch (error) {
       console.error("Error creating post:", error);
       return res.status(500).json({ message: "Error creating post" });
-    }
-  },
-];
-
-// Add a new endpoint for video compression preview
-export const compressVideoPreview = [
-  upload.single("video"),
-  async (req: Request, res: Response): Promise<Response> => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: "No video file provided" });
-      }
-
-      const compressedPath = await compressVideo(req.file.path);
-      // Delete original file
-      await fs.unlink(req.file.path);
-
-      return res.json({
-        path: compressedPath,
-        url: `http://localhost:5000/${compressedPath}`,
-      });
-    } catch (error) {
-      console.error("Error compressing video:", error);
-      return res.status(500).json({ message: "Error compressing video" });
     }
   },
 ];

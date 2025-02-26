@@ -1,0 +1,99 @@
+.message-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 70%;
+
+  &.own-message {
+    margin-left: auto;
+    flex-direction: row-reverse;
+
+    .message-content {
+      background-color: #646cff;
+      color: white;
+      border-radius: 12px 0px 12px 12px;
+
+      p {
+        color: white;
+      }
+
+      .message-time {
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+
+  &.other-message {
+    margin-right: auto;
+
+    .message-content {
+      background-color: #f1f5f9;
+      border-radius: 0px 12px 12px 12px;
+    }
+  }
+
+  .sender-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .message-content {
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+
+    .message-time {
+      display: block;
+      font-size: 0.7rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+  }
+
+  .message-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transform: translateY(50%);
+  }
+
+  .message-status {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-direction: row;
+
+    svg {
+      font-size: 14px;
+      color: #c3b8ff;
+      margin-inline: -2px;
+      transform: scaleX(0.9) scaleY(1.1) translateY(-1px);
+    }
+
+    &.read svg {
+      color: #61b3ff; // Blue color for read messages
+    }
+  }
+
+  .own-message {
+    .message-info {
+      justify-content: flex-end;
+    }
+  }
+
+  .other-message {
+    .message-info {
+      justify-content: flex-start;
+    }
+  }
+}

@@ -4,15 +4,15 @@ import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 export const compressVideo = (inputPath: string): Promise<string> => {
-  const outputPath = `${inputPath.split(".")[0]}.webm`;
+  const outputPath = `${inputPath.replace(/\.[^/.]+$/, "")}-compressed.webm`;
 
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
       .outputOptions([
         "-c:v libvpx-vp9", // Use VP9 codec
         "-crf 35", // Constant Rate Factor (quality setting, 0-63)
-        "-b:v 5000k", // Target bitrate
-        "-maxrate 5000k", // Maximum bitrate
+        "-b:v 8000k", // Target bitrate
+        "-maxrate 8000k", // Maximum bitrate
         "-bufsize 10000k", // Buffer size (2x maxrate)
         "-vf",
         "scale='min(1920,iw):-2',fps=fps=60", // Scale to 1080p and limit to 60fps

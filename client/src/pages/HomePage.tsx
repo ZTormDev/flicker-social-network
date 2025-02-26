@@ -73,11 +73,6 @@ const HomePage: React.FC<HomePageProps> = ({
     <div className="homepage-container">
       <Header onLogout={onLogout} />
       <div className="main-content">
-        <LeftSidebar
-          profile={profile}
-          onSearch={setSearchQuery}
-          searchQuery={searchQuery}
-        />
         {searchQuery ? (
           <SearchResults
             profile={profile}

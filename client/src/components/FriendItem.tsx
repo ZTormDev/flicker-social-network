@@ -70,7 +70,12 @@ const FriendItem: React.FC<FriendItemProps> = ({
         </button>
         {isSelected && (
           <div ref={optionsRef} className="options-container">
-            <button className="option">Open Chat</button>
+            <button
+              onClick={() => navigate(`/chats/${friend.Follower.id}`)}
+              className="option"
+            >
+              Open Chat
+            </button>
             <button
               className="option"
               onClick={() => navigate(`/profile/${friend.Follower.username}`)}

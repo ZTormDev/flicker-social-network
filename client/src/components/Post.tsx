@@ -200,6 +200,8 @@ const Post: React.FC<PostProps> = ({
 
     checkContentHeight();
 
+    console.log(post);
+
     // Add resize listener to recheck height when window size changes
     window.addEventListener("resize", checkContentHeight);
 
@@ -414,17 +416,18 @@ const Post: React.FC<PostProps> = ({
             showShowMore ? "can-expand" : ""
           }`}
         >
-          {post.media && post.media.length > 0 ? (
-            <>
-              <p className="post-text">
-                <b>{post.user?.username || "Unknown User"} </b> {post.content}
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="post-text">{post.content}</p>
-            </>
-          )}
+          {post.content &&
+            (post.media && post.media.length > 0 ? (
+              <>
+                <p className="post-text">
+                  <b>{post.user?.username || "Unknown User"} </b> {post.content}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="post-text">{post.content}</p>
+              </>
+            ))}
         </div>
         {showShowMore && (
           <button

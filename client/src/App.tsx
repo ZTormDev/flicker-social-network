@@ -13,6 +13,8 @@ import {
 import SearchResults from "./pages/SearchResults";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/404";
+import Chat from "./components/Chat";
+import MessagesPage from "./pages/ChatsPage";
 
 interface UserProfile {
   id: number;
@@ -178,6 +180,11 @@ function App() {
               <SearchResults onLogout={handleLogout} profile={profile} />
             }
           />
+          <Route
+            path="/chats"
+            element={<MessagesPage onLogout={handleLogout} profile={profile} />}
+          />
+          <Route path="/chats/:username" element={<Chat profile={profile} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       ) : (

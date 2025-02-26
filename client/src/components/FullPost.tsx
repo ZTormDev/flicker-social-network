@@ -328,7 +328,7 @@ const FullPost: React.FC<PostProps> = ({
             <div
               ref={postRef}
               data-post-id={post.id}
-              className={`fullpost-left ${isBurning ? "burning" : ""} ${
+              className={`fullpost-left  ${isBurning ? "burning" : ""} ${
                 isExpiringSoon() ? "expires-soon" : ""
               } ${isVisible ? "visible" : ""}`}
             >
@@ -446,18 +446,19 @@ const FullPost: React.FC<PostProps> = ({
                     showShowMore ? "can-expand" : ""
                   }`}
                 >
-                  {post.media && post.media.length > 0 ? (
-                    <>
-                      <p className="post-text">
-                        <b>{post.user?.username || "Unknown User"} </b>{" "}
-                        {post.content}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="post-text">{post.content}</p>
-                    </>
-                  )}
+                  {post.content &&
+                    (post.media && post.media.length > 0 ? (
+                      <>
+                        <p className="post-text">
+                          <b>{post.user?.username || "Unknown User"} </b>{" "}
+                          {post.content}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="post-text">{post.content}</p>
+                      </>
+                    ))}
                 </div>
                 {showShowMore && (
                   <button
@@ -482,9 +483,11 @@ const FullPost: React.FC<PostProps> = ({
             <div
               ref={postRef}
               data-post-id={post.id}
-              className={`fullpost-left ${isBurning ? "burning" : ""} ${
-                isExpiringSoon() ? "expires-soon" : ""
-              } ${isVisible ? "visible" : ""}`}
+              className={`fullpost-left no-media ${
+                isBurning ? "burning" : ""
+              } ${isExpiringSoon() ? "expires-soon" : ""} ${
+                isVisible ? "visible" : ""
+              }`}
             >
               <div className="post-header-container">
                 <div className="post-header">

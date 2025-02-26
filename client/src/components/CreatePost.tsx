@@ -26,6 +26,10 @@ const CreatePost: React.FC<CreatePostProps> = ({ onSubmit }) => {
     if (!content.trim() && mediaFiles.length == 0) return;
 
     setIsSubmitting(true);
+    if (mediaFiles.length > 0) {
+      setCompressionState(true);
+    }
+
     try {
       await onSubmit(content, mediaFiles);
       setContent("");
@@ -38,66 +42,21 @@ const CreatePost: React.FC<CreatePostProps> = ({ onSubmit }) => {
       console.error("Error creating post:", error);
     } finally {
       setIsSubmitting(false);
+      setCompressionState(false);
     }
   };
 
   const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
-    for (const file of files) {
-      if (file.type.startsWith("video/")) {
-        setCompressionState(true);
-        document.body.style.overflow = "hidden";
-
-        const formData = new FormData();
-        formData.append("video", file);
-
-        try {
-          const response = await fetch(
-            "http://localhost:5000/api/posts/compress-video",
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-              body: formData,
-            }
-          );
-
-          if (!response.ok) throw new Error("Video compression failed");
-
-          const data = await response.json();
-
-          const blobData = await (async () => {
-            const response = await fetch(data.url);
-            return await response.blob();
-          })();
-
-          setMediaFiles((prev) => [
-            ...prev,
-            new File([blobData], "compressed-video.webm", {
-              type: "video/webm",
-            }),
-          ]);
-
-          setMediaPreviews((prev) => [...prev, data.url]);
-        } catch (error) {
-          console.error("Error compressing video:", error);
-          alert("Failed to process video");
-        } finally {
-          setCompressionState(false);
-          document.body.style.overflow = "auto";
-        }
-      } else {
-        // Handle images as before
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setMediaPreviews((prev) => [...prev, reader.result as string]);
-        };
-        reader.readAsDataURL(file);
-        setMediaFiles((prev) => [...prev, file]);
-      }
-    }
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMediaPreviews((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+      setMediaFiles((prev) => [...prev, file]);
+    });
   };
 
   const removeMedia = (index: number) => {
@@ -231,7 +190,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onSubmit }) => {
         />
         {isCompressing && (
           <div className="compressing-container">
-            <p>Compressing your files, please wait...</p>
+            <p>Compressing your files and uploading, please wait...</p>
             <FontAwesomeIcon className="animate-spin" icon={faSpinner} />
           </div>
         )}
